@@ -37,11 +37,14 @@ function ResetPasswordForm() {
         setStatus("idle");
 
         try {
+            console.log(`[ResetPassword] 🔒 Submitting reset with token:`, token!.substring(0, 20) + '...');
             await authService.resetPassword({ token, newPassword: password });
+            console.log(`[ResetPassword] ✅ Password reset SUCCESS`);
             setStatus("success");
             setMessage("Your password has been reset successfully! You can now sign in with your new password.");
             setTimeout(() => router.push("/auth/sign-in"), 3000);
         } catch (err: unknown) {
+            console.log(`[ResetPassword] ❌ Password reset FAILED:`, err);
             setStatus("error");
             setMessage((err as { message?: string }).message || "Failed to reset password. The link may have expired.");
         } finally {

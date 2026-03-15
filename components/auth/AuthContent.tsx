@@ -99,10 +99,14 @@ export default function AuthContent({ initialState = "signin", onSuccess }: Auth
 
         try {
             if (isSignIn) {
+                console.log(`[AuthContent] 🔐 Submitting LOGIN for: ${email}`);
                 const response = await authService.login({ email, password });
+                console.log(`[AuthContent] ✅ LOGIN success — token: ${response.token ? 'yes' : 'no'}, user:`, response.user);
                 login(response.token, response.user);
             } else {
+                console.log(`[AuthContent] 📝 Submitting REGISTER for: ${name} / ${email}`);
                 const response = await authService.register({ name, email, password });
+                console.log(`[AuthContent] ✅ REGISTER response — token: ${response.token ? 'yes' : 'no'}`, response);
                 if (response.token) {
                     login(response.token, response.user);
                 } else {
@@ -114,7 +118,9 @@ export default function AuthContent({ initialState = "signin", onSuccess }: Auth
             if (onSuccess) onSuccess();
         } catch (err: unknown) {
             const raw = (err as { message?: string }).message ?? "";
+            console.log(`[AuthContent] ❌ ${isSignIn ? 'LOGIN' : 'REGISTER'} error (raw):`, raw);
             const friendly = friendlyError(raw, isSignIn);
+            console.log(`[AuthContent] ❌ Friendly error:`, friendly);
             const r = raw.toLowerCase();
 
             // Flag specific states for contextual UI
@@ -154,14 +160,13 @@ export default function AuthContent({ initialState = "signin", onSuccess }: Auth
         setError(null);
 
         try {
+            console.log(`[AuthContent] 🔑 Submitting FORGOT PASSWORD for: ${email}`);
             const res = await authService.forgotPassword(email);
+            console.log(`[AuthContent] ✅ FORGOT PASSWORD response:`, res);
             setError(res.message || "Reset link sent! Check your inbox.");
-            // Assuming a state for success message, let's add it if not present
-            // setIsSuccessMessage(true); // This line was in the instruction, but setIsSuccessMessage is not defined.
-            // For now, we'll rely on the error message content to determine success.
         } catch (err: unknown) {
+            console.log(`[AuthContent] ❌ FORGOT PASSWORD error:`, err);
             setError((err as { message?: string }).message || "Failed to send reset link.");
-            // setIsSuccessMessage(false); // Same as above
         } finally {
             setIsLoading(false);
         }

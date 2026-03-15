@@ -9,45 +9,63 @@ interface GenericResponse { success: boolean; message: string; }
 
 export const authService = {
     async register(data: RegisterData): Promise<AuthResponse> {
-        return apiRequest<AuthResponse>("/auth/register", {
+        console.log(`[Auth] 📝 REGISTER called with:`, { name: data.name, email: data.email, password: '***' });
+        const res = await apiRequest<AuthResponse>("/auth/register", {
             method: "POST",
             body: data,
         });
+        console.log(`[Auth] 📝 REGISTER response:`, res);
+        return res;
     },
 
     async login(data: LoginData): Promise<AuthResponse> {
-        return apiRequest<AuthResponse>("/auth/login", {
+        console.log(`[Auth] 🔐 LOGIN called with:`, { email: data.email, password: '***' });
+        const res = await apiRequest<AuthResponse>("/auth/login", {
             method: "POST",
             body: data,
         });
+        console.log(`[Auth] 🔐 LOGIN response:`, { token: res.token ? '✅ received' : '❌ missing', user: res.user });
+        return res;
     },
 
     async verifyEmail(token: string): Promise<AuthResponse> {
-        return apiRequest<AuthResponse>("/auth/verify-email", {
+        console.log(`[Auth] ✉️ VERIFY EMAIL called with token:`, token.substring(0, 20) + '...');
+        const res = await apiRequest<AuthResponse>("/auth/verify-email", {
             method: "POST",
             body: { token },
         });
+        console.log(`[Auth] ✉️ VERIFY EMAIL response:`, res);
+        return res;
     },
 
     async resendVerification(email: string): Promise<GenericResponse> {
-        return apiRequest<GenericResponse>("/auth/resend-verification", {
+        console.log(`[Auth] 🔄 RESEND VERIFICATION called for:`, email);
+        const res = await apiRequest<GenericResponse>("/auth/resend-verification", {
             method: "POST",
             body: { email },
         });
+        console.log(`[Auth] 🔄 RESEND VERIFICATION response:`, res);
+        return res;
     },
 
     async forgotPassword(email: string): Promise<GenericResponse> {
-        return apiRequest<GenericResponse>("/auth/forgot-password", {
+        console.log(`[Auth] 🔑 FORGOT PASSWORD called for:`, email);
+        const res = await apiRequest<GenericResponse>("/auth/forgot-password", {
             method: "POST",
             body: { email },
         });
+        console.log(`[Auth] 🔑 FORGOT PASSWORD response:`, res);
+        return res;
     },
 
     async resetPassword(data: ResetPasswordData): Promise<GenericResponse> {
-        return apiRequest<GenericResponse>("/auth/reset-password", {
+        console.log(`[Auth] 🔒 RESET PASSWORD called with token:`, data.token.substring(0, 20) + '...');
+        const res = await apiRequest<GenericResponse>("/auth/reset-password", {
             method: "POST",
             body: data,
         });
+        console.log(`[Auth] 🔒 RESET PASSWORD response:`, res);
+        return res;
     },
 
     async verifyToken(token: string): Promise<User> {
@@ -58,18 +76,20 @@ export const authService = {
     },
 
     async getProfile(token: string): Promise<User> {
-        return apiRequest<User>("/user/profile", {
+        const res = await apiRequest<{ success: boolean; user: User }>("/user/profile", {
             method: "GET",
             token,
         });
+        return res.user;
     },
 
     async updateProfile(token: string, data: Partial<User>): Promise<User> {
-        return apiRequest<User>("/user/profile", {
+        const res = await apiRequest<{ success: boolean; message: string; user: User }>("/user/profile", {
             method: "PATCH",
             body: data,
             token,
         });
+        return res.user;
     },
 
     async changePassword(token: string, data: ChangePasswordData): Promise<GenericResponse> {

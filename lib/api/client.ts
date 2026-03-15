@@ -13,6 +13,9 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
     const { method = "GET", body, headers = {}, token } = options;
     const url = `${BASE_URL}${endpoint}`;
 
+    console.log(`[API Client] 🚀 ${method} ${url}`);
+    if (body) console.log(`[API Client] 📦 Request body:`, JSON.stringify(body, null, 2));
+
     const requestHeaders: Record<string, string> = {
         "Content-Type": "application/json",
         ...headers,
@@ -20,6 +23,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
 
     if (token) {
         requestHeaders["Authorization"] = `Bearer ${token}`;
+        console.log(`[API Client] 🔑 Auth token attached`);
     }
 
     const config: RequestInit = {
@@ -32,18 +36,24 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
     }
 
     try {
+        console.log(`[API Client] ⏳ Fetching...`);
         const response = await fetch(url, config);
 
         // Check if response is JSON
         const contentType = response.headers.get("content-type");
         const isJson = contentType && contentType.includes("application/json");
 
+        console.log(`[API Client] 📡 Response status: ${response.status} ${response.statusText}`);
+        console.log(`[API Client] 📋 Content-Type: ${contentType}`);
+
         let data;
         if (isJson) {
             data = await response.json();
+            console.log(`[API Client] ✅ JSON Response:`, JSON.stringify(data, null, 2));
         } else {
             // Handle non-JSON response (could be an error page)
             const text = await response.text();
+            console.log(`[API Client] ⚠️ Non-JSON response (first 300 chars):`, text.substring(0, 300));
             if (!response.ok) {
                 throw {
                     message: `HTTP Error ${response.status}: ${response.statusText || 'Unknown Error'}`,
@@ -56,6 +66,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
         }
 
         if (!response.ok) {
+            console.log(`[API Client] ❌ API Error:`, data);
             throw {
                 message: data.message || `API Error ${response.status}`,
                 status: response.status,
