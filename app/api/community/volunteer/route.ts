@@ -7,7 +7,14 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { name, email, phone, projectTitle, skills, message } = body;
+        const stripHtml = (str: string) => str ? str.replace(/<[^>]*>/g, "").trim() : str;
+
+        const name = stripHtml(body.name);
+        const email = body.email;
+        const phone = body.phone;
+        const projectTitle = stripHtml(body.projectTitle);
+        const skills = stripHtml(body.skills || "");
+        const message = stripHtml(body.message || "");
 
         if (!name || !email || !phone || !projectTitle) {
             return NextResponse.json({ error: "Missing required fields." }, { status: 400 });

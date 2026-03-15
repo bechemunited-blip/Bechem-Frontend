@@ -9,10 +9,20 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { name, email, amount, projectTitle, method } = body;
+        const stripHtml = (str: string) => str ? str.replace(/<[^>]*>/g, "").trim() : str;
 
-        if (!name || !email || !amount || !projectTitle) {
+        const name = stripHtml(body.name);
+        const email = body.email;
+        const amount = Number(body.amount);
+        const projectTitle = stripHtml(body.projectTitle);
+        const method = body.method;
+
+        if (!name || !email || !projectTitle) {
             return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
+        }
+
+        if (!amount || !Number.isFinite(amount) || amount < 1 || amount > 1000000) {
+            return NextResponse.json({ error: "Invalid donation amount. Must be between 1 and 1,000,000 GHS." }, { status: 400 });
         }
 
         if (!process.env.PAYSTACK_SECRET_KEY) {

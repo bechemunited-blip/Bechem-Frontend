@@ -378,7 +378,7 @@ export default function CommunityPageContent({
 
                             return (
                                 <Link
-                                    href={project.slug?.current === "#" ? "#" : `/community/projects/${project.slug?.current}`}
+                                    href={project.slug?.current === "#" ? "/community/projects" : `/community/projects/${project.slug?.current}`}
                                     className="group relative overflow-hidden rounded-[32px] shadow-sm hover:shadow-2xl transition-all duration-500 min-h-[400px] md:min-h-0"
                                 >
                                     <Image
@@ -443,7 +443,7 @@ export default function CommunityPageContent({
                                     : (project as DummyProject).imageUrl;
                                 return (
                                     <Link
-                                        href={project.slug?.current === "#" ? "#" : `/community/projects/${project.slug?.current}`}
+                                        href={project.slug?.current === "#" ? "/community/projects" : `/community/projects/${project.slug?.current}`}
                                         className="relative overflow-hidden rounded-[32px] shadow-sm hover:shadow-lg transition-all min-h-[200px] md:min-h-0"
                                     >
                                         <Image
@@ -464,7 +464,7 @@ export default function CommunityPageContent({
                                     : (project as DummyProject).imageUrl;
                                 return (
                                     <Link
-                                        href={project.slug?.current === "#" ? "#" : `/community/projects/${project.slug?.current}`}
+                                        href={project.slug?.current === "#" ? "/community/projects" : `/community/projects/${project.slug?.current}`}
                                         className="relative overflow-hidden rounded-[32px] shadow-sm hover:shadow-lg transition-all min-h-[200px] md:min-h-0"
                                     >
                                         <Image
@@ -485,7 +485,7 @@ export default function CommunityPageContent({
                                     : (project as DummyProject).imageUrl;
                                 return (
                                     <Link
-                                        href={project.slug?.current === "#" ? "#" : `/community/projects/${project.slug?.current}`}
+                                        href={project.slug?.current === "#" ? "/community/projects" : `/community/projects/${project.slug?.current}`}
                                         className="relative col-span-1 sm:col-span-2 overflow-hidden rounded-[32px] shadow-sm hover:shadow-lg transition-all min-h-[200px] md:min-h-0"
                                     >
                                         <Image
