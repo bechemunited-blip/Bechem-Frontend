@@ -169,22 +169,22 @@ export default function LiveMatchesSection({
           </Button>
         </div>
       </div>
-      <div className="absolute -bottom-22 -right-22 sm:-bottom-30 sm:-right-30 md:-bottom-36 md:-right-36 lg:-bottom-56 lg:-right-56 xl:-bottom-70 xl:-right-65 opacity-2.5 z-10">
+      <div className="absolute -bottom-22 -right-22 sm:-bottom-30 sm:-right-30 md:-bottom-36 md:-right-36 lg:-bottom-56 lg:-right-56 xl:-bottom-70 xl:-right-65 opacity-[0.015] z-10">
         <Image
           src="/img/vector_arrow.png"
           alt="vector pattern"
           width={1000}
           height={1000}
-          className="w-[200px] xs:w-[220px] sm:w-[260px] md:w-[300px] lg:w-[450px] xl:w-[570px] rotate-40"
+          className="w-[150px] xs:w-[180px] sm:w-[220px] md:w-[260px] lg:w-[350px] xl:w-[450px] rotate-40"
         />
       </div>
-      <div className="absolute -bottom-22 -left-22 sm:-bottom-30 sm:-left-30 md:-bottom-36 md:-left-36 lg:-bottom-56 lg:-left-56 xl:-bottom-70 xl:-left-65 opacity-2.5 z-10">
+      <div className="absolute -bottom-22 -left-22 sm:-bottom-30 sm:-left-30 md:-bottom-36 md:-left-36 lg:-bottom-56 lg:-left-56 xl:-bottom-70 xl:-left-65 opacity-[0.015] z-10">
         <Image
           src="/img/vector_arrow.png"
           alt="vector pattern"
           width={1000}
           height={1000}
-          className="w-[200px] xs:w-[220px] sm:w-[260px] md:w-[300px] lg:w-[450px] xl:w-[570px] rotate-140"
+          className="w-[150px] xs:w-[180px] sm:w-[220px] md:w-[260px] lg:w-[350px] xl:w-[450px] rotate-140"
         />
       </div>
     </section>

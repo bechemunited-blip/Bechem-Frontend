@@ -17,14 +17,14 @@ export default function Breadcrumbs({ onColor = true }: BreadcrumbsProps) {
     if (segments.length === 0) return null;
 
     return (
-        <nav className={`flex items-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] ${onColor ? "text-white/60" : "text-neutral-5"
+        <nav className={`flex items-center gap-2 text-xs md:text-sm font-bold uppercase tracking-wider ${onColor ? "text-white/60" : "text-neutral-7"
             }`}>
             <Link
                 href="/"
                 className={`transition-colors flex items-center gap-1.5 ${onColor ? "hover:text-white" : "hover:text-primary"
                     }`}
             >
-                <Icon icon="ph:house-fill" className="w-3.5 h-3.5" />
+                <Icon icon="ph:house-fill" className="w-4 h-4" />
                 Home
             </Link>
 
@@ -39,10 +39,10 @@ export default function Breadcrumbs({ onColor = true }: BreadcrumbsProps) {
                     <div key={href} className="flex items-center gap-2">
                         <Icon
                             icon="ph:caret-right-bold"
-                            className={`w-2.5 h-2.5 ${onColor ? "text-white/20" : "text-neutral-3"}`}
+                            className={`w-3 h-3 ${onColor ? "text-white/20" : "text-neutral-4"}`}
                         />
                         {isLast ? (
-                            <span className={onColor ? "text-white" : "text-secondary"}>
+                            <span className={onColor ? "text-white" : "text-neutral-9"}>
                                 {label}
                             </span>
                         ) : (

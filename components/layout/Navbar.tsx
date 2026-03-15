@@ -96,9 +96,9 @@ export default function Navbar() {
   };
 
   return (
-    <main className="fixed top-0 left-0 w-full z-50">
+    <div>
       <header
-        className={`w-full ${isScrolled ? "bg-neutral-1/80 backdrop-blur-md" : "bg-neutral-1"}`}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-neutral-1/80 backdrop-blur-md shadow-sm" : "bg-neutral-1"}`}
       >
         <nav className="container-wide max-w-360 h-full mx-auto flex items-center justify-between py-2.5 sm:py-3 md:py-3.5 lg:py-4">
           {/* Left: Menu + Links */}
@@ -226,14 +226,14 @@ export default function Navbar() {
       {/* Sidebar Overlay */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 "
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-60 animate-in fade-in duration-300"
           onClick={() => setOpen(false)}
         />
       )}
 
       {/* Sidebar Menu */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72  md:w-85 xl:w-90 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-0 left-0 h-full w-72 md:w-85 xl:w-90 bg-white shadow-2xl z-70 transform transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         <div className="flex flex-col h-full">
@@ -248,12 +248,9 @@ export default function Navbar() {
                     alt="Bechem United FC"
                     width={200}
                     height={200}
-                    className="w-6 md:8 object-contain"
+                    className="w-10 md:12 object-contain"
                     unoptimized
                   />
-                  <span className="text-sm md:text-base font-semibold text-neutral-9">
-                    Bechem United FC
-                  </span>
                 </div>
               </Link>
 
@@ -343,6 +340,6 @@ export default function Navbar() {
           </nav>
         </div>
       </aside>
-    </main>
+    </div>
   );
 }

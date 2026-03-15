@@ -24,8 +24,8 @@ import {
 import { fixtureService } from "@/lib/api/fixtures";
 import { convertBackendFixture, enrichFixturesWithClubData } from "@/lib/fixtureHelpers";
 
-// Revalidate every 60 seconds
-export const revalidate = 60;
+// Force dynamic rendering
+export const revalidate = 0;
 
 export default async function Home() {
   const [
@@ -59,7 +59,7 @@ export default async function Home() {
     if (results[0].status === 'fulfilled' && results[0].value.length > 0) {
       matchFixtures = results[0].value.map(convertBackendFixture);
     }
-  } catch (err) {
+  } catch {
     // This should technically not be reached with Promise.allSettled, but good for safety
     console.log("Home: Backend fixtures unavailable, using fallbacks.");
   }
@@ -99,6 +99,12 @@ export default async function Home() {
 
   // Fallback settings if none exist in Sanity
   const defaultSettings: HomePageSettings = {
+    heroHeading: "THE HUNTERS",
+    heroSubheading: "Vision with Precision",
+    heroCtaText: "Join the Hunt",
+    heroCtaLink: "/community",
+    heroSecondaryCtaText: "Match Tickets",
+    heroSecondaryCtaLink: "/tickets",
     heroNewsBtnText: "Full Story",
     newsSectionTitle: "LATEST FROM HUNTERS",
     newsSectionSubtext:
@@ -130,7 +136,7 @@ export default async function Home() {
         liveMatchesSettings={liveMatchesSettings}
         newsletterSettings={newsletterSettings}
         nextFourRecentNews={nextFourRecentNews}
-        settings={settings || defaultSettings}
+        settings={{ ...defaultSettings, ...settings }}
         sponsorSettings={sponsorSettings}
         featuredProducts={featuredProducts}
         nextFixture={nextFixture}

@@ -4,7 +4,6 @@ import { FixtureWithClubData } from "@/lib/types";
 import { urlFor } from "@/lib/sanity.client";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
-import Button from "../ui/Button";
 import ImageFallback from "../ui/ImageFallback";
 
 interface FixtureRowProps {
@@ -164,13 +163,7 @@ export default function FixtureRow({ fixture }: FixtureRowProps) {
                         <span className="text-[13px] font-medium text-neutral-400">Matchday {fixture.matchday || "13"}</span>
                     </div>
 
-                    <Button
-                        variant="ghost"
-                        size="lg"
-                        buttonClassName="!border-prim-9 !text-prim-9 hover:!bg-prim-9 hover:!text-white rounded-full px-10 py-3.5 text-sm font-bold transition-all duration-300 active:scale-95 shadow-sm"
-                    >
-                        Buy Tickets
-                    </Button>
+
                 </div>
             </div>
         </div>

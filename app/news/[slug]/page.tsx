@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import SectionHeader from "@/components/layout/SectionHeader";
 import { Icon } from "@iconify/react";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
 
 // Revalidate every 60 seconds
 export const revalidate = 60;
@@ -57,8 +58,8 @@ export default async function NewsArticlePage({
 
   return (
     <div className="min-h-screen bg-[#F1EFF6]">
-      {/* Back Button */}
-      <div className="container-wide pt-24 md:pt-32 pb-6 relative z-10">
+      {/* Back Button & Breadcrumbs */}
+      <div className="container-wide pt-24 md:pt-32 pb-4 relative z-10 flex flex-col gap-4">
         <Link
           href="/news"
           className="inline-flex items-center gap-2 text-neutral-text font-bold transition-all hover:translate-x-[-4px]"
@@ -66,6 +67,9 @@ export default async function NewsArticlePage({
           <Icon icon="lucide:circle-arrow-left" className="w-6 h-6" />
           <span className="text-sm uppercase tracking-widest">Go Back</span>
         </Link>
+        <div className="pt-4 border-t border-neutral-3">
+          <Breadcrumbs onColor={false} />
+        </div>
       </div>
 
       <article className="container-wide pb-20">

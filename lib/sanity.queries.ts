@@ -202,7 +202,7 @@ export const latestNonFeaturedNewsQuery = groq`
 `;
 
 export const mostRecentNewsQuery = groq`
-  *[_type == "news"] | order(publishedAt desc) [0] {
+  *[_type == "news"] | order(isFeatured desc, publishedAt desc) [0] {
     _id,
     title,
     slug,
@@ -230,6 +230,13 @@ export const nextFourRecentNewsQuery = groq`
 
 export const homePageSettingsQuery = groq`
   *[_id == "homePageSettings"][0] {
+    heroHeading,
+    heroSubheading,
+    heroImage,
+    heroCtaText,
+    heroCtaLink,
+    heroSecondaryCtaText,
+    heroSecondaryCtaLink,
     heroNewsBtnText,
     newsSectionTitle,
     newsSectionSubtext,

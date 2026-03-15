@@ -35,8 +35,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             const userData = await authService.verifyToken(storedToken);
             setUser(userData);
-        } catch (error) {
-            console.error("Token verification failed:", error);
+        } catch (error: unknown) {
+            const err = error as { message?: string };
+            console.error("Token verification failed:", err.message || error);
             localStorage.removeItem("bufc_token");
             setToken(null);
             setUser(null);

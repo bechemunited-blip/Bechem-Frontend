@@ -7,8 +7,6 @@ import { urlFor } from "@/lib/sanity.client";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 import ImageFallback from "../ui/ImageFallback";
-import Button from "../ui/Button";
-import { FiArrowUpRight } from "react-icons/fi";
 
 interface FixtureHeroProps {
     nextFixture: FixtureWithClubData;
@@ -61,17 +59,7 @@ export default function FixtureHero({ nextFixture }: FixtureHeroProps) {
             {/* Dark overlay */}
             <div className="absolute inset-0 z-0 bg-black/60" />
 
-            {/* See full fixtures */}
-            <Button
-                href="/tickets"
-                variant="ghost"
-                size="lg"
-                textClassName="font-normal group-hover:underline"
-                buttonClassName="group absolute top-2.5 right-2.5 !text-sm lg:!text-base !p-0 !text-neutral-1 !justify-end z-20"
-                rightIcon={<FiArrowUpRight className="w-5 h-5" />}
-            >
-                Get Tickets
-            </Button>
+
 
             {/* Content */}
             <div className="relative z-10 flex flex-col items-center gap-8 md:gap-10 w-full md:max-w-xl">

@@ -1,0 +1,32 @@
+Settings from Sanity: {
+  "_createdAt": "2026-01-06T00:09:04Z",
+  "_id": "homePageSettings",
+  "_rev": "P2a3XeBoRDK3Pcx1veJ7dI",
+  "_system": {
+    "base": {
+      "id": "homePageSettings",
+      "rev": "ktJeLZ64CQNg0LCcArwBHg"
+    }
+  },
+  "_type": "homePageSettings",
+  "_updatedAt": "2026-01-08T02:47:47Z",
+  "fixtureSectionBtnText": "Full Schedule",
+  "fixtureSectionSubtext": "Don't miss a moment of the action. Check out our upcoming matches and get your tickets early.",
+  "fixtureSectionTitle": "UPCOMING FIXTURES",
+  "heroNewsBtnText": "Full Story",
+  "moreFixturesSubtext": "Mark your calendar for these upcoming clashes",
+  "moreFixturesTitle": "What’s ahead",
+  "newsContentBtnText": "Discover more",
+  "newsContentSubtext": "Welcome to the home of Bechem United FC news. Here you'll find everything from match day coverage and player spotlights to community initiatives and youth development programs that define who we are.\nThe Hunters are more than a team—we're a community. Stay updated with news that matters, from the pitch to the people who make this club special.",
+  "newsContentTitle": "NEWS & UPDATES",
+  "newsSectionSubtext": " Stay updated with the latest news, match reports, and announcements from Bechem United FC",
+  "newsSectionTitle": "LATEST FROM HUNTERS",
+  "photoHighlightsBtnText": "Explore Gallery",
+  "photoHighlightsSubtext": "Relive the best moments from recent matches, training sessions, and club events.",
+  "photoHighlightsTitle": "Photo Highlights",
+  "shopSectionBtnText": "Visit Store",
+  "shopSectionSubtext": "Discover the latest official merchandise, new collections, and exclusive Bechem United FC store updates.",
+  "shopSectionTitle": "OUR CLUB STORE",
+  "title": "Home Page Settings"
+}
+Most recent news: Three Players Return from Injury

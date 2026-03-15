@@ -123,8 +123,15 @@ export default function CommunityDashboard() {
             <div className="container-wide py-12 md:py-16">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar Navigation */}
-                    <aside className={`lg:w-72 shrink-0 transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0 fixed inset-y-0 left-0 z-50 bg-white shadow-xl p-4 w-72' : 'hidden lg:block'}`}>
-                        <Card variant="default" padding="none" cardClassName="sticky top-24 overflow-hidden">
+                    {sidebarOpen && (
+                        <div
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden animate-in fade-in duration-300"
+                            onClick={() => setSidebarOpen(false)}
+                        />
+                    )}
+
+                    <aside className={`lg:w-72 shrink-0 transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0 fixed inset-y-0 left-0 z-50 bg-white shadow-xl p-4 w-72 overflow-y-auto' : 'hidden lg:block'}`}>
+                        <Card variant="default" padding="none" cardClassName="sticky lg:top-24 overflow-hidden">
                             <div className="p-8 bg-primary text-white text-center">
                                 <div className="relative w-24 h-24 mx-auto mb-4">
                                     <div className="w-full h-full rounded-full bg-white/20 flex items-center justify-center border-2 border-primary/20 overflow-hidden relative">
@@ -169,10 +176,6 @@ export default function CommunityDashboard() {
                                 </button>
                             </div>
                         </Card>
-
-                        {sidebarOpen && (
-                            <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
-                        )}
                     </aside>
 
                     {/* Mobile Menu Toggle */}

@@ -129,33 +129,25 @@ export default function PhotoHighlightsSection({
                         </div>
                     </div>
 
-                    {/* Bottom Controls */}
-                    <div className="mt-8 md:mt-16 flex items-center justify-between w-full">
-                        {/* Center Pagination Icon Mockup */}
-                        <div className="flex-1" />
-                        <div className="flex items-center gap-3 text-[#1A1A1A]">
-                            <Icon icon="ph:caret-left-bold" className="w-4 h-4 cursor-pointer hover:text-[#3F2A78] transition-colors" />
-                            <div className="w-2 h-2 rounded-full border border-[#1A1A1A]" />
-                            <Icon icon="ph:caret-right-bold" className="w-4 h-4 cursor-pointer hover:text-[#3F2A78] transition-colors" />
-                        </div>
+                </div>
 
-                        {/* Explore Gallery Link */}
-                        <div className="flex-1 flex justify-end">
-                            <Button
-                                href="/gallery"
-                                variant="ghost"
-                                size="lg"
-                                rightIcon={
-                                    <Icon
-                                        icon="ph:arrow-right-bold"
-                                        className="w-5 h-5"
-                                    />
-                                }
-                                buttonClassName="!p-0 !text-[#1A1A1A] hover:!text-[#3F2A78] transition-all duration-300 font-bold"
-                            >
-                                {settings.photoHighlightsBtnText || "Explore Gallery"}
-                            </Button>
-                        </div>
+                {/* Bottom Controls */}
+                <div className="mt-8 md:mt-16 flex items-center justify-end w-full max-w-[957px] mx-auto pb-12 md:pb-0">
+                    <div className="flex justify-end">
+                        <Button
+                            href="/gallery"
+                            variant="ghost"
+                            size="lg"
+                            rightIcon={
+                                <Icon
+                                    icon="ph:arrow-right-bold"
+                                    className="w-5 h-5"
+                                />
+                            }
+                            buttonClassName="!p-0 !text-[#1A1A1A] hover:!text-[#3F2A78] transition-all duration-300 font-bold"
+                        >
+                            {settings.photoHighlightsBtnText || "Explore Gallery"}
+                        </Button>
                     </div>
                 </div>
             </div>

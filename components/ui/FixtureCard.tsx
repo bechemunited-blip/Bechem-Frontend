@@ -3,7 +3,6 @@ import { urlFor } from "@/lib/sanity.client";
 import Image from "next/image";
 import ImageFallback from "./ImageFallback";
 import { Icon } from "@iconify/react";
-import Button from "./Button";
 
 interface FixtureCardProps {
   fixture: FixtureWithClubData;
@@ -267,16 +266,7 @@ export default function FixtureCard({
           </div>
         </div>
 
-        {/* Action Button */}
-        <div className="mt-6 mb-2 flex justify-center">
-          <Button
-            href="/tickets"
-            variant="outline"
-            buttonClassName="w-[314px] h-[43px] px-4 py-[13px] rounded-full border-[#3F2A78] text-[#3F2A78] hover:bg-[#3F2A78] hover:text-white font-bold text-[14px] flex items-center justify-center transition-all duration-300 shadow-none hover:shadow-md"
-          >
-            Buy Tickets Now
-          </Button>
-        </div>
+
       </div>
 
     </div>

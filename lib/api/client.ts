@@ -9,6 +9,12 @@ interface RequestOptions {
     token?: string;
 }
 
+interface ApiError extends Error {
+    status?: number;
+    code?: string;
+    originalError?: unknown;
+}
+
 export async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     const { method = "GET", body, headers = {}, token } = options;
     const url = `${BASE_URL}${endpoint}`;
@@ -55,11 +61,9 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
             const text = await response.text();
             console.log(`[API Client] ⚠️ Non-JSON response (first 300 chars):`, text.substring(0, 300));
             if (!response.ok) {
-                throw {
-                    message: `HTTP Error ${response.status}: ${response.statusText || 'Unknown Error'}`,
-                    status: response.status,
-                    rawResponse: text.substring(0, 200)
-                };
+                const error = new Error(`HTTP Error ${response.status}: ${response.statusText || 'Unknown Error'}`) as ApiError;
+                error.status = response.status;
+                throw error;
             }
             // Return text or empty if successful but not JSON
             return text as unknown as T;
@@ -76,20 +80,20 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
 
         return data as T;
     } catch (error: unknown) {
-        const err = error as { status?: number; message?: string };
-        // If it's already our custom error, re-throw it
+        const err = error as ApiError;
+
+        // If it's already an error with a status, just re-throw it
         if (err.status !== undefined) throw err;
 
-        // Log locally if needed, but avoid cluttering server logs with expected network failures
+        // Create a proper error object that stringifies well
+        const connectionError = new Error(err.message || "Failed to connect to the backend API.") as ApiError;
+        connectionError.status = 0;
+        connectionError.originalError = error;
+
         if (process.env.NODE_ENV === 'development') {
-            console.log(`[API Client] Connection failed to ${url}: ${err.message || 'Unknown network error'}`);
+            console.log(`[API Client] Connection failed to ${url}:`, error);
         }
 
-        // Throw a clean error for the caller to catch
-        throw {
-            message: "Failed to connect to the backend API. Ensure the server is running.",
-            status: 0,
-            originalError: error
-        };
+        throw connectionError;
     }
 }

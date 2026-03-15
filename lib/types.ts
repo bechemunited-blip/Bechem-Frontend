@@ -211,6 +211,13 @@ export interface ShopPageSettings {
 
 // HOME PAGE SETTINGS INTERFACE
 export interface HomePageSettings {
+  heroHeading: string;
+  heroSubheading: string;
+  heroImage?: SanityImage;
+  heroCtaText: string;
+  heroCtaLink: string;
+  heroSecondaryCtaText: string;
+  heroSecondaryCtaLink: string;
   heroNewsBtnText: string;
   newsSectionTitle: string;
   newsSectionSubtext: string;

@@ -12,21 +12,42 @@ interface NewsletterProps {
 
 export default function Newsletter({ settings }: NewsletterProps) {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus("loading");
+    if (!email) return;
 
-    // TODO: Implement newsletter signup logic
-    // For now, just simulate a submission
-    setTimeout(() => {
-      setStatus("success");
-      setEmail("");
-      setTimeout(() => setStatus("idle"), 3000);
-    }, 1000);
+    setStatus("loading");
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "footer" }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus("success");
+        setSuccessMessage(data.message || "Subscription successful — check your inbox.");
+        setEmail("");
+        // Reset to idle after 8 seconds to give more time to read
+        setTimeout(() => setStatus("idle"), 8000);
+      } else {
+        setStatus("error");
+        setErrorMessage(data.message || "Something went wrong. Please try again.");
+      }
+    } catch {
+      setStatus("error");
+      setErrorMessage("Service unavailable. Please try again later.");
+    }
   };
 
   return (
@@ -94,7 +115,15 @@ export default function Newsletter({ settings }: NewsletterProps) {
           {/* Success Message */}
           {status === "success" && (
             <p className="text-prim-4 text-sm mt-4 animate-fade-in">
-              Successfully subscribed! Check your inbox.
+              {successMessage}
+            </p>
+          )}
+
+          {/* Error Message (Issue 2, Step 3) */}
+          {status === "error" && (
+            <p className="text-red-400 text-sm mt-4 animate-fade-in flex items-center gap-2">
+              <Icon icon="mdi:alert-circle" />
+              {errorMessage}
             </p>
           )}
         </div>

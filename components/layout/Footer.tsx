@@ -210,16 +210,10 @@ export default function Footer({ settings }: FooterProps) {
             </p>
             <div className="flex items-center gap-4">
               <Link
-                href="/privacy"
+                href="/privacy-policy"
                 className="text-neutral-7 text-xs hover:text-primary transition-colors"
               >
-                Privacy
-              </Link>
-              <Link
-                href="/policy"
-                className="text-neutral-7 text-xs hover:text-primary transition-colors"
-              >
-                Policy
+                Privacy Policy
               </Link>
               <Link
                 href="/disclaimer"
