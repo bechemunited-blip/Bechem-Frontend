@@ -12,6 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { authService } from "@/lib/api/auth";
 import { User } from "@/lib/api/types";
+import { uploadMedia } from "@/lib/api/media";
 import ActivityFeed from "@/components/community/ActivityFeed";
 import PaymentModal from "@/components/ui/PaymentModal";
 
@@ -308,29 +309,46 @@ function SettingsTab({ user, token, onUpdate }: { user: User, token: string, onU
     const [avatar, setAvatar] = useState(user.avatar || "");
     const [headerImage, setHeaderImage] = useState(user.headerImage || "");
     const [isLoading, setIsLoading] = useState(false);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const [uploadingHeader, setUploadingHeader] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'header') => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'header') => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Check file size (max 2MB for base64 safety)
-        if (file.size > 2 * 1024 * 1024) {
-            setError("Image size too large. Please select an image under 2MB.");
+        // Check file size (max 10MB for Cloudinary)
+        if (file.size > 10 * 1024 * 1024) {
+            setError("Image size too large. Please select an image under 10MB.");
             return;
         }
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64String = reader.result as string;
-            if (type === 'avatar') {
-                setAvatar(base64String);
+        setError(null);
+        const isAvatar = type === 'avatar';
+        isAvatar ? setUploadingAvatar(true) : setUploadingHeader(true);
+
+        try {
+            const result = await uploadMedia(
+                file,
+                {
+                    type: "image",
+                    entityType: "users",
+                    category: isAvatar ? "avatars" : "headers",
+                },
+                token
+            );
+
+            if (isAvatar) {
+                setAvatar(result.file.url);
             } else {
-                setHeaderImage(base64String);
+                setHeaderImage(result.file.url);
             }
-        };
-        reader.readAsDataURL(file);
+        } catch (err: unknown) {
+            setError((err as Error).message || "Failed to upload image");
+        } finally {
+            isAvatar ? setUploadingAvatar(false) : setUploadingHeader(false);
+        }
     };
 
     const handleUpdateProfile = async () => {
@@ -368,23 +386,27 @@ function SettingsTab({ user, token, onUpdate }: { user: User, token: string, onU
                 {/* Profile Picture Upload */}
                 <div className="flex flex-col sm:flex-row items-center gap-6 p-6 bg-neutral-1 rounded-2xl border border-neutral-3">
                     <div className="relative w-24 h-24 shrink-0 rounded-full bg-white border-2 border-primary/20 overflow-hidden flex items-center justify-center">
-                        {avatar ? (
+                        {uploadingAvatar ? (
+                            <div className="flex items-center justify-center w-full h-full">
+                                <Icon icon="ph:spinner" className="w-8 h-8 text-primary animate-spin" />
+                            </div>
+                        ) : avatar ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={avatar} alt="Profile preview" className="w-full h-full object-cover" />
                         ) : (
                             <Icon icon="ph:user-duotone" className="w-12 h-12 text-neutral-4" />
                         )}
-                        <label className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                        <label className={`absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center ${uploadingAvatar ? 'pointer-events-none' : 'cursor-pointer'}`}>
                             <Icon icon="ph:camera-fill" className="text-white w-8 h-8" />
-                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'avatar')} />
+                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'avatar')} disabled={uploadingAvatar} />
                         </label>
                     </div>
                     <div>
                         <h4 className="font-bold text-neutral-9 mb-1">Profile Picture</h4>
-                        <p className="text-xs text-neutral-5 mb-3">Upload a clean face shot to be recognized in match threads.</p>
-                        <label className="text-xs font-bold text-primary hover:underline cursor-pointer">
-                            Change Avatar
-                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'avatar')} />
+                        <p className="text-xs text-neutral-5 mb-3">Upload a clean face shot to be recognized in match threads. Max 10MB.</p>
+                        <label className={`text-xs font-bold text-primary hover:underline ${uploadingAvatar ? 'pointer-events-none opacity-50' : 'cursor-pointer'}`}>
+                            {uploadingAvatar ? "Uploading..." : "Change Avatar"}
+                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'avatar')} disabled={uploadingAvatar} />
                         </label>
                     </div>
                 </div>
@@ -393,7 +415,12 @@ function SettingsTab({ user, token, onUpdate }: { user: User, token: string, onU
                 <div className="space-y-3">
                     <h4 className="text-sm font-bold text-neutral-7">Dashboard Banner</h4>
                     <div className="relative w-full h-32 md:h-40 bg-neutral-1 rounded-2xl border border-dotted border-neutral-4 overflow-hidden group">
-                        {headerImage ? (
+                        {uploadingHeader ? (
+                            <div className="w-full h-full flex flex-col items-center justify-center text-primary">
+                                <Icon icon="ph:spinner" className="w-10 h-10 mb-2 animate-spin" />
+                                <span className="text-xs font-bold">Uploading...</span>
+                            </div>
+                        ) : headerImage ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={headerImage} alt="Header preview" className="w-full h-full object-cover" />
                         ) : (
@@ -402,13 +429,13 @@ function SettingsTab({ user, token, onUpdate }: { user: User, token: string, onU
                                 <span className="text-xs">No banner set</span>
                             </div>
                         )}
-                        <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer">
+                        <label className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white ${uploadingHeader ? 'pointer-events-none' : 'cursor-pointer'}`}>
                             <Icon icon="ph:upload-simple-bold" className="w-8 h-8 mb-2" />
                             <span className="text-xs font-bold uppercase tracking-widest">Update Banner</span>
-                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'header')} />
+                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'header')} disabled={uploadingHeader} />
                         </label>
                     </div>
-                    <p className="text-[10px] text-neutral-4 italic">Recommended size: 1200x400px. Max size 2MB.</p>
+                    <p className="text-[10px] text-neutral-4 italic">Recommended size: 1200x400px. Max size 10MB.</p>
                 </div>
             </div>
 
