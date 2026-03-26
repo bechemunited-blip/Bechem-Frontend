@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,8 +12,56 @@ import {
     getInitials,
     makeGuestAuthor,
 } from "@/lib/community/data";
+import {
+    communityPostsApi,
+    commentsApi,
+    BackendPost,
+    BackendComment,
+} from "@/lib/api/community";
 import { Post, Comment, ReactionType, PostAuthor } from "@/lib/community/types";
 import SectionHeader from "@/components/layout/SectionHeader";
+
+// ─── Backend → Frontend Mappers ──────────────────────────────────────────────
+
+function mapBackendPost(post: BackendPost, userId?: string): Post {
+    return {
+        id: post._id,
+        author: {
+            id: post.authorId,
+            name: post.authorName,
+            role: "fan" as const,
+            badge: "Fan" as const,
+        },
+        content: post.content,
+        image: post.imageUrl || undefined,
+        createdAt: post._createdAt,
+        reactions: [
+            { type: "like" as const, count: post.likesCount, reacted: userId ? post.likes.includes(userId) : false },
+            { type: "fire" as const, count: 0, reacted: false },
+            { type: "heart" as const, count: 0, reacted: false },
+            { type: "celebrate" as const, count: 0, reacted: false },
+        ],
+        comments: [],
+        commentsOpen: false,
+        type: "post" as const,
+        pinned: post.isPinned,
+    };
+}
+
+function mapBackendComment(comment: BackendComment, userId?: string): Comment {
+    return {
+        id: comment._id,
+        author: {
+            id: comment.authorId,
+            name: comment.authorName,
+            role: "fan" as const,
+        },
+        content: comment.content,
+        createdAt: comment._createdAt,
+        likes: comment.likesCount,
+        likedByMe: userId ? comment.likes.includes(userId) : false,
+    };
+}
 
 // ─── Avatar Helper ────────────────────────────────────────────────────────────
 function Avatar({
@@ -61,9 +109,11 @@ function AuthorBadge({ badge }: { badge?: string }) {
 function ComposeBox({
     onPost,
     author,
+    disabled,
 }: {
     onPost: (content: string) => void;
     author: PostAuthor;
+    disabled?: boolean;
 }) {
     const [content, setContent] = useState("");
     const [focused, setFocused] = useState(false);
@@ -92,11 +142,12 @@ function ComposeBox({
                     <textarea
                         ref={textareaRef}
                         rows={focused ? 3 : 1}
-                        placeholder={`What's on your mind, ${author.name.split(" ")[0]}?`}
+                        placeholder={disabled ? "Log in to post..." : `What's on your mind, ${author.name.split(" ")[0]}?`}
                         value={content}
                         onChange={(e) => { setContent(e.target.value); autoResize(); }}
                         onFocus={() => setFocused(true)}
-                        className="w-full resize-none outline-none text-sm text-neutral-800 placeholder:text-neutral-400 font-medium leading-relaxed pt-2 bg-transparent"
+                        disabled={disabled}
+                        className="w-full resize-none outline-none text-sm text-neutral-800 placeholder:text-neutral-400 font-medium leading-relaxed pt-2 bg-transparent disabled:opacity-50"
                     />
                 </div>
             </div>
@@ -339,11 +390,13 @@ function CommentsSection({
     currentAuthor,
     onAddComment,
     onLikeComment,
+    isLoadingComments,
 }: {
     post: Post;
     currentAuthor: PostAuthor;
     onAddComment: (postId: string, content: string) => void;
     onLikeComment: (postId: string, commentId: string) => void;
+    isLoadingComments?: boolean;
 }) {
     const [newComment, setNewComment] = useState("");
 
@@ -361,6 +414,13 @@ function CommentsSection({
             transition={{ duration: 0.2 }}
             className="mt-4 space-y-3 overflow-hidden"
         >
+            {isLoadingComments && (
+                <div className="flex items-center justify-center py-4">
+                    <Icon icon="ph:spinner" className="w-5 h-5 text-neutral-400 animate-spin" />
+                    <span className="text-xs text-neutral-400 ml-2">Loading comments...</span>
+                </div>
+            )}
+
             {post.comments.map((comment) => (
                 <CommentItem
                     key={comment.id}
@@ -375,7 +435,7 @@ function CommentsSection({
                 <div className="flex-1 flex gap-2">
                     <input
                         type="text"
-                        placeholder="Write a comment…"
+                        placeholder="Write a comment..."
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && submit()}
@@ -403,6 +463,8 @@ function PostCard({
     onAddComment,
     onLikeComment,
     onVote,
+    onFlag,
+    isLoadingComments,
 }: {
     post: Post;
     currentAuthor: PostAuthor;
@@ -411,9 +473,12 @@ function PostCard({
     onAddComment: (postId: string, content: string) => void;
     onLikeComment: (postId: string, commentId: string) => void;
     onVote: (postId: string, optionId: string) => void;
+    onFlag: (postId: string) => void;
+    isLoadingComments?: boolean;
 }) {
     const isAnnouncement = post.type === "announcement";
     const isPoll = post.type === "poll";
+    const [menuOpen, setMenuOpen] = useState(false);
 
     return (
         <motion.div
@@ -444,9 +509,32 @@ function PostCard({
                             <span className="text-xs text-neutral-400">{formatRelativeTime(post.createdAt)} ago</span>
                         </div>
                     </div>
-                    <button className="p-2 rounded-xl text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 transition-all">
-                        <Icon icon="ph:dots-three-bold" className="w-5 h-5" />
-                    </button>
+                    <div className="relative">
+                        <button
+                            onClick={() => setMenuOpen((o) => !o)}
+                            className="p-2 rounded-xl text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 transition-all"
+                        >
+                            <Icon icon="ph:dots-three-bold" className="w-5 h-5" />
+                        </button>
+                        <AnimatePresence>
+                            {menuOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9, y: -4 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9, y: -4 }}
+                                    className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-neutral-100 py-1 z-20 min-w-[140px]"
+                                >
+                                    <button
+                                        onClick={() => { onFlag(post.id); setMenuOpen(false); }}
+                                        className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-red-500 hover:bg-red-50 transition-all"
+                                    >
+                                        <Icon icon="ph:flag-duotone" className="w-4 h-4" />
+                                        Report
+                                    </button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -494,6 +582,7 @@ function PostCard({
                             currentAuthor={currentAuthor}
                             onAddComment={onAddComment}
                             onLikeComment={onLikeComment}
+                            isLoadingComments={isLoadingComments}
                         />
                     )}
                 </AnimatePresence>
@@ -594,9 +683,17 @@ const FILTERS = [
 
 // ─── Main Activity Feed ───────────────────────────────────────────────────────
 export default function ActivityFeed() {
-    const { user } = useAuth();
-    const [posts, setPosts] = useState<Post[]>(SEED_POSTS);
+    const { user, token } = useAuth();
+    const [posts, setPosts] = useState<Post[]>([]);
     const [activeFilter, setActiveFilter] = useState("all");
+    const [isLoading, setIsLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [loadingCommentsFor, setLoadingCommentsFor] = useState<string | null>(null);
+
+    // Track which posts have had their comments fetched already
+    const fetchedCommentsRef = useRef<Set<string>>(new Set());
 
     // Memoised so useCallback dependency arrays stay stable across renders
     const currentAuthor = useMemo(
@@ -607,28 +704,128 @@ export default function ActivityFeed() {
         [user]
     );
 
+    // ── Fetch posts on mount ──
+    useEffect(() => {
+        let cancelled = false;
+
+        async function fetchPosts() {
+            if (!token) {
+                // Guest user — use seed data as fallback
+                setPosts(SEED_POSTS);
+                setIsLoading(false);
+                setHasMore(false);
+                return;
+            }
+
+            try {
+                const res = await communityPostsApi.list(token, 1, 20);
+                if (cancelled) return;
+
+                if (res.success && res.data.length > 0) {
+                    const mapped = res.data
+                        .filter((p) => !p.isHidden && p.status === "active")
+                        .map((p) => mapBackendPost(p, user?.id));
+                    setPosts(mapped);
+                    setHasMore(res.page < res.totalPages);
+                } else {
+                    // Empty result — fall back to seed data
+                    setPosts(SEED_POSTS);
+                    setHasMore(false);
+                }
+            } catch (err) {
+                console.error("Failed to fetch community posts:", err);
+                // Graceful degradation — use seed data
+                setPosts(SEED_POSTS);
+                setHasMore(false);
+            } finally {
+                if (!cancelled) setIsLoading(false);
+            }
+        }
+
+        fetchPosts();
+        return () => { cancelled = true; };
+    }, [token, user?.id]);
+
+    // ── Load older posts (pagination) ──
+    const handleLoadMore = useCallback(async () => {
+        if (!token || loadingMore || !hasMore) return;
+
+        setLoadingMore(true);
+        try {
+            const nextPage = page + 1;
+            const res = await communityPostsApi.list(token, nextPage, 20);
+
+            if (res.success && res.data.length > 0) {
+                const mapped = res.data
+                    .filter((p) => !p.isHidden && p.status === "active")
+                    .map((p) => mapBackendPost(p, user?.id));
+                setPosts((prev) => [...prev, ...mapped]);
+                setPage(nextPage);
+                setHasMore(nextPage < res.totalPages);
+            } else {
+                setHasMore(false);
+            }
+        } catch (err) {
+            console.error("Failed to load more posts:", err);
+        } finally {
+            setLoadingMore(false);
+        }
+    }, [token, page, loadingMore, hasMore, user?.id]);
+
     // ── Post new ──
-    const handleNewPost = useCallback((content: string) => {
-        const newPost: Post = {
-            id: `p-${Date.now()}`,
-            author: currentAuthor,
-            content,
-            createdAt: new Date().toISOString(),
-            reactions: [
-                { type: "like", count: 0, reacted: false },
-                { type: "fire", count: 0, reacted: false },
-                { type: "heart", count: 0, reacted: false },
-                { type: "celebrate", count: 0, reacted: false },
-            ],
-            comments: [],
-            commentsOpen: false,
-            type: "post",
-        };
-        setPosts((prev) => [newPost, ...prev]);
-    }, [currentAuthor]);
+    const handleNewPost = useCallback(async (content: string) => {
+        if (!token || !user) {
+            // Not authenticated — optimistic local-only post as fallback
+            const localPost: Post = {
+                id: `p-${Date.now()}`,
+                author: currentAuthor,
+                content,
+                createdAt: new Date().toISOString(),
+                reactions: [
+                    { type: "like", count: 0, reacted: false },
+                    { type: "fire", count: 0, reacted: false },
+                    { type: "heart", count: 0, reacted: false },
+                    { type: "celebrate", count: 0, reacted: false },
+                ],
+                comments: [],
+                commentsOpen: false,
+                type: "post",
+            };
+            setPosts((prev) => [localPost, ...prev]);
+            return;
+        }
+
+        try {
+            const res = await communityPostsApi.create({ content }, token);
+            if (res.success && res.data) {
+                const mapped = mapBackendPost(res.data, user.id);
+                setPosts((prev) => [mapped, ...prev]);
+            }
+        } catch (err) {
+            console.error("Failed to create post:", err);
+            // Fallback: add post locally so the user sees their content
+            const fallbackPost: Post = {
+                id: `p-${Date.now()}`,
+                author: currentAuthor,
+                content,
+                createdAt: new Date().toISOString(),
+                reactions: [
+                    { type: "like", count: 0, reacted: false },
+                    { type: "fire", count: 0, reacted: false },
+                    { type: "heart", count: 0, reacted: false },
+                    { type: "celebrate", count: 0, reacted: false },
+                ],
+                comments: [],
+                commentsOpen: false,
+                type: "post",
+            };
+            setPosts((prev) => [fallbackPost, ...prev]);
+        }
+    }, [token, user, currentAuthor]);
 
     // ── React ──
-    const handleReact = useCallback((postId: string, type: ReactionType) => {
+    const handleReact = useCallback(async (postId: string, type: ReactionType) => {
+        // Optimistically update the UI for all reaction types
         setPosts((prev) =>
             prev.map((p) => {
                 if (p.id !== postId) return p;
@@ -644,35 +841,121 @@ export default function ActivityFeed() {
                 };
             })
         );
-    }, []);
 
-    // ── Toggle comments ──
-    const handleToggleComments = useCallback((postId: string) => {
+        // Only call the API for the "like" reaction; fire/heart/celebrate are client-side only
+        if (type === "like" && token) {
+            try {
+                await communityPostsApi.like(postId, token);
+            } catch (err) {
+                console.error("Failed to like post:", err);
+                // Revert the optimistic update on failure
+                setPosts((prev) =>
+                    prev.map((p) => {
+                        if (p.id !== postId) return p;
+                        return {
+                            ...p,
+                            reactions: p.reactions.map((r) => {
+                                if (r.type === "like") {
+                                    return { ...r, count: r.reacted ? r.count - 1 : r.count + 1, reacted: !r.reacted };
+                                }
+                                return r;
+                            }),
+                        };
+                    })
+                );
+            }
+        }
+    }, [token]);
+
+    // ── Toggle comments (fetches from API on first open) ──
+    const handleToggleComments = useCallback(async (postId: string) => {
+        // Find the current post to check if comments are being opened or closed
+        const currentPost = posts.find((p) => p.id === postId);
+        const isOpening = currentPost && !currentPost.commentsOpen;
+
+        // Toggle the commentsOpen state immediately
         setPosts((prev) =>
             prev.map((p) => (p.id === postId ? { ...p, commentsOpen: !p.commentsOpen } : p))
         );
-    }, []);
+
+        // If opening and we haven't fetched comments yet, fetch them
+        if (isOpening && !fetchedCommentsRef.current.has(postId) && token) {
+            setLoadingCommentsFor(postId);
+            try {
+                const res = await commentsApi.list("fan_post", postId, token);
+                if (res.success && res.data.length > 0) {
+                    const mappedComments = res.data.map((c) => mapBackendComment(c, user?.id));
+                    setPosts((prev) =>
+                        prev.map((p) => (p.id === postId ? { ...p, comments: mappedComments } : p))
+                    );
+                }
+                fetchedCommentsRef.current.add(postId);
+            } catch (err) {
+                console.error("Failed to fetch comments:", err);
+            } finally {
+                setLoadingCommentsFor(null);
+            }
+        }
+    }, [posts, token, user?.id]);
 
     // ── Add comment ──
-    const handleAddComment = useCallback((postId: string, content: string) => {
-        const newComment: Comment = {
-            id: `c-${Date.now()}`,
-            author: currentAuthor,
-            content,
-            createdAt: new Date().toISOString(),
-            likes: 0,
-            likedByMe: false,
-        };
-        setPosts((prev) =>
-            prev.map((p) => {
-                if (p.id !== postId) return p;
-                return { ...p, comments: [...p.comments, newComment], commentsOpen: true };
-            })
-        );
-    }, [currentAuthor]);
+    const handleAddComment = useCallback(async (postId: string, content: string) => {
+        if (!token || !user) {
+            // Not authenticated — add locally only
+            const localComment: Comment = {
+                id: `c-${Date.now()}`,
+                author: currentAuthor,
+                content,
+                createdAt: new Date().toISOString(),
+                likes: 0,
+                likedByMe: false,
+            };
+            setPosts((prev) =>
+                prev.map((p) => {
+                    if (p.id !== postId) return p;
+                    return { ...p, comments: [...p.comments, localComment], commentsOpen: true };
+                })
+            );
+            return;
+        }
+
+        try {
+            const res = await commentsApi.create(
+                { content, entityType: "fan_post", entityId: postId },
+                token
+            );
+            if (res.success && res.data) {
+                const mappedComment = mapBackendComment(res.data, user.id);
+                setPosts((prev) =>
+                    prev.map((p) => {
+                        if (p.id !== postId) return p;
+                        return { ...p, comments: [...p.comments, mappedComment], commentsOpen: true };
+                    })
+                );
+            }
+        } catch (err) {
+            console.error("Failed to add comment:", err);
+            // Fallback: add locally
+            const fallbackComment: Comment = {
+                id: `c-${Date.now()}`,
+                author: currentAuthor,
+                content,
+                createdAt: new Date().toISOString(),
+                likes: 0,
+                likedByMe: false,
+            };
+            setPosts((prev) =>
+                prev.map((p) => {
+                    if (p.id !== postId) return p;
+                    return { ...p, comments: [...p.comments, fallbackComment], commentsOpen: true };
+                })
+            );
+        }
+    }, [token, user, currentAuthor]);
 
     // ── Like comment ──
-    const handleLikeComment = useCallback((postId: string, commentId: string) => {
+    const handleLikeComment = useCallback(async (postId: string, commentId: string) => {
+        // Optimistic update
         setPosts((prev) =>
             prev.map((p) => {
                 if (p.id !== postId) return p;
@@ -685,9 +968,30 @@ export default function ActivityFeed() {
                 };
             })
         );
-    }, []);
 
-    // ── Vote on poll ──
+        if (token) {
+            try {
+                await commentsApi.like(commentId, token);
+            } catch (err) {
+                console.error("Failed to like comment:", err);
+                // Revert on failure
+                setPosts((prev) =>
+                    prev.map((p) => {
+                        if (p.id !== postId) return p;
+                        return {
+                            ...p,
+                            comments: p.comments.map((c) => {
+                                if (c.id !== commentId) return c;
+                                return { ...c, likes: c.likedByMe ? c.likes - 1 : c.likes + 1, likedByMe: !c.likedByMe };
+                            }),
+                        };
+                    })
+                );
+            }
+        }
+    }, [token]);
+
+    // ── Vote on poll (client-side only, same as before) ──
     const handleVote = useCallback((postId: string, optionId: string) => {
         setPosts((prev) =>
             prev.map((p) => {
@@ -703,6 +1007,19 @@ export default function ActivityFeed() {
             })
         );
     }, []);
+
+    // ── Flag / Report post ──
+    const handleFlag = useCallback(async (postId: string) => {
+        if (!token) return;
+
+        try {
+            await communityPostsApi.flag(postId, token);
+            // Optionally show a toast / feedback — for now just log
+            console.log("Post reported successfully:", postId);
+        } catch (err) {
+            console.error("Failed to report post:", err);
+        }
+    }, [token]);
 
     // ── Apply filter ──
     const filteredPosts = posts.filter((p) => {
@@ -727,7 +1044,18 @@ export default function ActivityFeed() {
                 {/* ── Feed Column ─────────────────────────── */}
                 <div className="flex-1 min-w-0 space-y-4">
                     {/* Compose */}
-                    <ComposeBox onPost={handleNewPost} author={currentAuthor} />
+                    <ComposeBox
+                        onPost={handleNewPost}
+                        author={currentAuthor}
+                        disabled={!user}
+                    />
+
+                    {/* Login prompt for guests */}
+                    {!user && (
+                        <div className="text-center py-2">
+                            <p className="text-xs text-neutral-400">Log in to create posts, like, and comment.</p>
+                        </div>
+                    )}
 
                     {/* Filter tabs */}
                     <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
@@ -746,36 +1074,65 @@ export default function ActivityFeed() {
                         ))}
                     </div>
 
-                    {/* Posts */}
-                    <div className="space-y-4">
-                        <AnimatePresence initial={false}>
-                            {filteredPosts.map((post) => (
-                                <PostCard
-                                    key={post.id}
-                                    post={post}
-                                    currentAuthor={currentAuthor}
-                                    onReact={handleReact}
-                                    onToggleComments={handleToggleComments}
-                                    onAddComment={handleAddComment}
-                                    onLikeComment={handleLikeComment}
-                                    onVote={handleVote}
-                                />
-                            ))}
-                        </AnimatePresence>
+                    {/* Loading spinner */}
+                    {isLoading && (
+                        <div className="flex flex-col items-center justify-center py-16">
+                            <Icon icon="ph:spinner" className="w-8 h-8 text-primary animate-spin mb-3" />
+                            <p className="text-sm font-medium text-neutral-400">Loading posts...</p>
+                        </div>
+                    )}
 
-                        {filteredPosts.length === 0 && (
-                            <div className="text-center py-16 text-neutral-400">
-                                <Icon icon="ph:chat-slash-duotone" className="w-12 h-12 mx-auto mb-3 text-neutral-300" />
-                                <p className="text-sm font-medium">No posts in this category yet.</p>
-                                <p className="text-xs mt-1">Be the first to post something!</p>
-                            </div>
-                        )}
-                    </div>
+                    {/* Posts */}
+                    {!isLoading && (
+                        <div className="space-y-4">
+                            <AnimatePresence initial={false}>
+                                {filteredPosts.map((post) => (
+                                    <PostCard
+                                        key={post.id}
+                                        post={post}
+                                        currentAuthor={currentAuthor}
+                                        onReact={handleReact}
+                                        onToggleComments={handleToggleComments}
+                                        onAddComment={handleAddComment}
+                                        onLikeComment={handleLikeComment}
+                                        onVote={handleVote}
+                                        onFlag={handleFlag}
+                                        isLoadingComments={loadingCommentsFor === post.id}
+                                    />
+                                ))}
+                            </AnimatePresence>
+
+                            {filteredPosts.length === 0 && (
+                                <div className="text-center py-16 text-neutral-400">
+                                    <Icon icon="ph:chat-slash-duotone" className="w-12 h-12 mx-auto mb-3 text-neutral-300" />
+                                    <p className="text-sm font-medium">No posts in this category yet.</p>
+                                    <p className="text-xs mt-1">Be the first to post something!</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Load more */}
-                    <button className="w-full py-3 text-xs font-bold text-neutral-500 hover:text-primary border border-dashed border-neutral-200 hover:border-primary/30 rounded-xl transition-all">
-                        Load older posts
-                    </button>
+                    {!isLoading && hasMore && (
+                        <button
+                            onClick={handleLoadMore}
+                            disabled={loadingMore}
+                            className="w-full py-3 text-xs font-bold text-neutral-500 hover:text-primary border border-dashed border-neutral-200 hover:border-primary/30 rounded-xl transition-all disabled:opacity-50"
+                        >
+                            {loadingMore ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <Icon icon="ph:spinner" className="w-4 h-4 animate-spin" />
+                                    Loading...
+                                </span>
+                            ) : (
+                                "Load older posts"
+                            )}
+                        </button>
+                    )}
+
+                    {!isLoading && !hasMore && posts.length > 0 && (
+                        <p className="text-center text-xs text-neutral-400 py-3">You have reached the end of the feed.</p>
+                    )}
                 </div>
 
                 {/* ── Sidebar ──────────────────────────────── */}
