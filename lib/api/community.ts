@@ -83,18 +83,18 @@ export interface PaginatedResponse<T> {
 
 export const communityPostsApi = {
   async list(token: string, page = 1, pageSize = 20): Promise<PaginatedResponse<BackendPost>> {
-    return apiRequest<PaginatedResponse<BackendPost>>("/community-posts", {
+    return apiRequest<PaginatedResponse<BackendPost>>("/fan-posts", {
       method: "GET",
       token,
     });
   },
 
   async get(id: string, token: string): Promise<{ success: boolean; data: BackendPost }> {
-    return apiRequest(`/community-posts/${id}`, { token });
+    return apiRequest(`/fan-posts/${id}`, { token });
   },
 
   async create(data: { content: string; imageUrl?: string }, token: string) {
-    return apiRequest<{ success: boolean; data: BackendPost }>("/community-posts", {
+    return apiRequest<{ success: boolean; data: BackendPost }>("/fan-posts", {
       method: "POST",
       body: data,
       token,
@@ -102,7 +102,7 @@ export const communityPostsApi = {
   },
 
   async update(id: string, data: { content?: string; imageUrl?: string }, token: string) {
-    return apiRequest<{ success: boolean; data: BackendPost }>(`/community-posts/${id}`, {
+    return apiRequest<{ success: boolean; data: BackendPost }>(`/fan-posts/${id}`, {
       method: "PATCH",
       body: data,
       token,
@@ -110,21 +110,21 @@ export const communityPostsApi = {
   },
 
   async delete(id: string, token: string) {
-    return apiRequest<{ success: boolean }>(`/community-posts/${id}`, {
+    return apiRequest<{ success: boolean }>(`/fan-posts/${id}`, {
       method: "DELETE",
       token,
     });
   },
 
   async like(id: string, token: string) {
-    return apiRequest<{ success: boolean; data: BackendPost }>(`/community-posts/${id}/like`, {
+    return apiRequest<{ success: boolean; data: BackendPost }>(`/fan-posts/${id}/like`, {
       method: "POST",
       token,
     });
   },
 
   async flag(id: string, token: string) {
-    return apiRequest<{ success: boolean }>(`/community-posts/${id}/flag`, {
+    return apiRequest<{ success: boolean }>(`/fan-posts/${id}/flag`, {
       method: "POST",
       token,
     });
@@ -216,15 +216,15 @@ export const pollsApi = {
 
 export const communityEventsApi = {
   async list(token: string): Promise<PaginatedResponse<BackendEvent>> {
-    return apiRequest<PaginatedResponse<BackendEvent>>("/community-events", { token });
+    return apiRequest<PaginatedResponse<BackendEvent>>("/events", { token });
   },
 
   async get(id: string, token: string): Promise<{ success: boolean; data: BackendEvent }> {
-    return apiRequest(`/community-events/${id}`, { token });
+    return apiRequest(`/events/${id}`, { token });
   },
 
   async rsvp(id: string, status: string, token: string) {
-    return apiRequest<{ success: boolean }>(`/community-events/${id}/rsvp`, {
+    return apiRequest<{ success: boolean }>(`/events/${id}/rsvp`, {
       method: "POST",
       body: { status },
       token,
@@ -232,7 +232,7 @@ export const communityEventsApi = {
   },
 
   async cancelRsvp(id: string, token: string) {
-    return apiRequest<{ success: boolean }>(`/community-events/${id}/rsvp`, {
+    return apiRequest<{ success: boolean }>(`/events/${id}/rsvp`, {
       method: "DELETE",
       token,
     });
