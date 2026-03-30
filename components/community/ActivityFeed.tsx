@@ -1,19 +1,72 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useMemo } from "react";
-import Image from "next/image";
+import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/store/hooks/useAuth";
 import {
-    SEED_POSTS,
     REACTION_META,
     formatRelativeTime,
     getInitials,
     makeGuestAuthor,
 } from "@/lib/community/data";
 import { Post, Comment, ReactionType, PostAuthor } from "@/lib/community/types";
+import {
+    communityPostsService,
+    commentsService,
+    BackendFanPost,
+    BackendComment,
+} from "@/lib/api/community-posts";
 import SectionHeader from "@/components/layout/SectionHeader";
+
+// ─── Backend → Frontend Mappers ──────────────────────────────────────────────
+// Backend returns raw Sanity documents with flat authorId/authorName strings.
+// Avatar and role are not stored on fan posts/comments, so we default role to
+// "fan" here. The user's own posts will show their avatar via the currentAuthor
+// prop which comes from the auth profile.
+
+function mapPostAuthor(authorId: string, authorName: string): PostAuthor {
+    return {
+        id: authorId,
+        name: authorName,
+        role: "fan",
+        badge: "Fan",
+    };
+}
+
+function mapBackendPost(post: BackendFanPost, currentUserId?: string): Post {
+    const userLiked = currentUserId ? post.likes?.includes(currentUserId) : false;
+    return {
+        id: post._id,
+        author: mapPostAuthor(post.authorId, post.authorName),
+        content: post.content,
+        image: post.imageUrl,
+        createdAt: post._createdAt,
+        reactions: [
+            { type: "like", count: post.likesCount ?? 0, reacted: userLiked },
+            { type: "fire", count: 0, reacted: false },
+            { type: "heart", count: 0, reacted: false },
+            { type: "celebrate", count: 0, reacted: false },
+        ],
+        comments: [],
+        commentsOpen: false,
+        type: "post",
+        pinned: post.isPinned,
+        commentsCount: post.commentsCount ?? 0,
+    };
+}
+
+function mapBackendComment(comment: BackendComment, currentUserId?: string): Comment {
+    const userLiked = currentUserId ? comment.likes?.includes(currentUserId) : false;
+    return {
+        id: comment._id,
+        author: mapPostAuthor(comment.authorId, comment.authorName),
+        content: comment.content,
+        createdAt: comment._createdAt,
+        likes: comment.likesCount ?? 0,
+        likedByMe: userLiked,
+    };
+}
 
 // ─── Avatar Helper ────────────────────────────────────────────────────────────
 function Avatar({
@@ -30,7 +83,6 @@ function Avatar({
             className={`${dims[size]} rounded-full ring-2 ${ringColor} overflow-hidden shrink-0 flex items-center justify-center font-black bg-primary/10 text-primary`}
         >
             {author.avatar ? (
-                // Avatar URLs come from the auth profile and are external — next/image fill works here
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={author.avatar} alt={author.name} className="w-full h-full object-cover" />
             ) : (
@@ -61,19 +113,70 @@ function AuthorBadge({ badge }: { badge?: string }) {
 function ComposeBox({
     onPost,
     author,
+    isSubmitting,
 }: {
-    onPost: (content: string) => void;
+    onPost: (content: string, imageUrl?: string) => void;
     author: PostAuthor;
+    isSubmitting: boolean;
 }) {
+    const { token } = useAuth();
     const [content, setContent] = useState("");
     const [focused, setFocused] = useState(false);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handlePost = () => {
-        if (!content.trim()) return;
-        onPost(content.trim());
+    const handlePost = async () => {
+        if ((!content.trim() && !imageFile) || isSubmitting || isUploading) return;
+
+        let uploadedUrl: string | undefined;
+
+        // Upload image first if one was selected
+        if (imageFile && token) {
+            setIsUploading(true);
+            try {
+                const { uploadMedia } = await import("@/lib/api/media");
+                const res = await uploadMedia(
+                    imageFile,
+                    { type: "image", entityType: "fan_post", category: "community" },
+                    token
+                );
+                uploadedUrl = res.file.url;
+            } catch (err) {
+                console.error("Image upload failed:", err);
+                setIsUploading(false);
+                return;
+            }
+            setIsUploading(false);
+        }
+
+        onPost(content.trim(), uploadedUrl);
         setContent("");
+        setImageFile(null);
+        setImagePreview(null);
         setFocused(false);
+    };
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type and size (max 5MB)
+        if (!file.type.startsWith("image/")) return;
+        if (file.size > 5 * 1024 * 1024) return;
+
+        setImageFile(file);
+        const reader = new FileReader();
+        reader.onload = () => setImagePreview(reader.result as string);
+        reader.readAsDataURL(file);
+    };
+
+    const removeImage = () => {
+        setImageFile(null);
+        setImagePreview(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
     const autoResize = () => {
@@ -83,6 +186,8 @@ function ComposeBox({
             el.style.height = `${el.scrollHeight}px`;
         }
     };
+
+    const canPost = (content.trim() || imageFile) && !isSubmitting && !isUploading;
 
     return (
         <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden transition-all duration-300">
@@ -101,8 +206,33 @@ function ComposeBox({
                 </div>
             </div>
 
+            {/* Image preview */}
+            {imagePreview && (
+                <div className="px-4 pb-2">
+                    <div className="relative inline-block rounded-xl overflow-hidden border border-neutral-200">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={imagePreview} alt="Upload preview" className="max-h-48 rounded-xl object-cover" />
+                        <button
+                            onClick={removeImage}
+                            className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition-all"
+                        >
+                            <Icon icon="ph:x-bold" className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Hidden file input */}
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+            />
+
             <AnimatePresence>
-                {(focused || content) && (
+                {(focused || content || imageFile) && (
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
@@ -110,37 +240,37 @@ function ComposeBox({
                         className="border-t border-neutral-100 px-4 py-3 flex items-center justify-between bg-neutral-50/50"
                     >
                         <div className="flex gap-1">
-                            {[
-                                { icon: "ph:image-duotone", label: "Photo", color: "text-green-600" },
-                                { icon: "ph:smiley-duotone", label: "Emoji", color: "text-amber-500" },
-                                { icon: "ph:tag-duotone", label: "Tag", color: "text-blue-500" },
-                            ].map((item) => (
-                                <button
-                                    key={item.label}
-                                    title={item.label}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-500 hover:bg-neutral-100 transition-all"
-                                >
-                                    <Icon icon={item.icon} className={`w-4 h-4 ${item.color}`} />
-                                    <span className="hidden sm:inline">{item.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                        <div className="flex gap-2">
                             <button
-                                onClick={() => { setContent(""); setFocused(false); }}
+                                onClick={() => fileInputRef.current?.click()}
+                                title="Upload a photo"
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-500 hover:bg-neutral-100 transition-all"
+                            >
+                                <Icon icon="ph:image-duotone" className="w-4 h-4 text-green-600" />
+                                <span className="hidden sm:inline">Photo</span>
+                            </button>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                            {isUploading && (
+                                <span className="text-[10px] text-neutral-400 flex items-center gap-1">
+                                    <Icon icon="line-md:loading-twotone-loop" className="w-3.5 h-3.5" />
+                                    Uploading...
+                                </span>
+                            )}
+                            <button
+                                onClick={() => { setContent(""); setFocused(false); removeImage(); }}
                                 className="px-4 py-2 rounded-xl text-xs font-bold text-neutral-500 hover:bg-neutral-200 transition-all"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handlePost}
-                                disabled={!content.trim()}
-                                className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${content.trim()
+                                disabled={!canPost}
+                                className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${canPost
                                     ? "bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/20"
                                     : "bg-neutral-200 text-neutral-400 cursor-not-allowed"
                                     }`}
                             >
-                                Post
+                                {isSubmitting ? "Posting..." : isUploading ? "Uploading..." : "Post"}
                             </button>
                         </div>
                     </motion.div>
@@ -242,60 +372,6 @@ function ReactionBar({
     );
 }
 
-// ─── Poll Block ───────────────────────────────────────────────────────────────
-function PollBlock({
-    options,
-    onVote,
-}: {
-    options: NonNullable<Post["pollOptions"]>;
-    onVote: (id: string) => void;
-}) {
-    const totalVotes = options.reduce((s, o) => s + o.votes, 0);
-    const hasVoted = options.some((o) => o.votedByMe);
-
-    return (
-        <div className="mt-4 space-y-2">
-            {options.map((opt) => {
-                const pct = totalVotes === 0 ? 0 : Math.round((opt.votes / totalVotes) * 100);
-                return (
-                    <button
-                        key={opt.id}
-                        onClick={() => !hasVoted && onVote(opt.id)}
-                        disabled={hasVoted}
-                        className={`relative w-full text-left rounded-xl overflow-hidden border transition-all ${opt.votedByMe
-                            ? "border-primary bg-primary/5"
-                            : hasVoted
-                                ? "border-neutral-200 bg-neutral-50 cursor-default"
-                                : "border-neutral-200 hover:border-primary hover:bg-primary/5 cursor-pointer"
-                            }`}
-                    >
-                        {hasVoted && (
-                            <div
-                                className="absolute inset-y-0 left-0 bg-primary/10 transition-all duration-700"
-                                style={{ width: `${pct}%` }}
-                            />
-                        )}
-                        <div className="relative flex items-center justify-between px-4 py-3">
-                            <span className={`text-sm font-semibold ${opt.votedByMe ? "text-primary" : "text-neutral-700"}`}>
-                                {opt.votedByMe && <Icon icon="ph:check-bold" className="inline w-3 h-3 mr-1.5" />}
-                                {opt.text}
-                            </span>
-                            {hasVoted && (
-                                <span className={`text-xs font-black ${opt.votedByMe ? "text-primary" : "text-neutral-400"}`}>
-                                    {pct}%
-                                </span>
-                            )}
-                        </div>
-                    </button>
-                );
-            })}
-            {hasVoted && (
-                <p className="text-xs text-neutral-400 text-center pt-1">{totalVotes} votes total</p>
-            )}
-        </div>
-    );
-}
-
 // ─── Comment Item ─────────────────────────────────────────────────────────────
 function CommentItem({
     comment,
@@ -339,11 +415,13 @@ function CommentsSection({
     currentAuthor,
     onAddComment,
     onLikeComment,
+    isLoadingComments,
 }: {
     post: Post;
     currentAuthor: PostAuthor;
     onAddComment: (postId: string, content: string) => void;
     onLikeComment: (postId: string, commentId: string) => void;
+    isLoadingComments: boolean;
 }) {
     const [newComment, setNewComment] = useState("");
 
@@ -361,13 +439,19 @@ function CommentsSection({
             transition={{ duration: 0.2 }}
             className="mt-4 space-y-3 overflow-hidden"
         >
-            {post.comments.map((comment) => (
-                <CommentItem
-                    key={comment.id}
-                    comment={comment}
-                    onLike={(cId) => onLikeComment(post.id, cId)}
-                />
-            ))}
+            {isLoadingComments ? (
+                <div className="flex items-center justify-center py-4">
+                    <Icon icon="line-md:loading-twotone-loop" className="w-5 h-5 text-neutral-400" />
+                </div>
+            ) : (
+                post.comments.map((comment) => (
+                    <CommentItem
+                        key={comment.id}
+                        comment={comment}
+                        onLike={(cId) => onLikeComment(post.id, cId)}
+                    />
+                ))
+            )}
 
             {/* New comment input */}
             <div className="flex gap-3 pt-1">
@@ -375,7 +459,7 @@ function CommentsSection({
                 <div className="flex-1 flex gap-2">
                     <input
                         type="text"
-                        placeholder="Write a comment…"
+                        placeholder="Write a comment..."
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && submit()}
@@ -402,7 +486,7 @@ function PostCard({
     onToggleComments,
     onAddComment,
     onLikeComment,
-    onVote,
+    isLoadingComments,
 }: {
     post: Post;
     currentAuthor: PostAuthor;
@@ -410,10 +494,9 @@ function PostCard({
     onToggleComments: (postId: string) => void;
     onAddComment: (postId: string, content: string) => void;
     onLikeComment: (postId: string, commentId: string) => void;
-    onVote: (postId: string, optionId: string) => void;
+    isLoadingComments: boolean;
 }) {
     const isAnnouncement = post.type === "announcement";
-    const isPoll = post.type === "poll";
 
     return (
         <motion.div
@@ -463,26 +546,19 @@ function PostCard({
                     </div>
                 )}
 
-                {/* Featured Image */}
-                {post.image && !isPoll && (
+                {/* Featured Image — external URLs from user uploads */}
+                {post.image && (
                     <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-3">
-                        <Image src={post.image} alt="" fill className="object-cover" />
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={post.image} alt="" className="w-full h-full object-cover" />
                     </div>
-                )}
-
-                {/* Poll */}
-                {isPoll && post.pollOptions && (
-                    <PollBlock
-                        options={post.pollOptions}
-                        onVote={(optId) => onVote(post.id, optId)}
-                    />
                 )}
 
                 {/* Reaction bar */}
                 <ReactionBar
                     reactions={post.reactions}
                     onReact={(type) => onReact(post.id, type)}
-                    totalComments={post.comments.length}
+                    totalComments={post.commentsCount ?? post.comments.length}
                     onCommentClick={() => onToggleComments(post.id)}
                 />
 
@@ -494,6 +570,7 @@ function PostCard({
                             currentAuthor={currentAuthor}
                             onAddComment={onAddComment}
                             onLikeComment={onLikeComment}
+                            isLoadingComments={isLoadingComments}
                         />
                     )}
                 </AnimatePresence>
@@ -559,7 +636,7 @@ function TrendingTopics() {
 function ClubNewsSidebar() {
     const news = [
         { title: "Bechem United signs new striker ahead of second round", time: "2h" },
-        { title: "Match preview: Hunters vs Kotoko – tactical breakdown", time: "5h" },
+        { title: "Match preview: Hunters vs Kotoko - tactical breakdown", time: "5h" },
         { title: "Community project delivers 200 school bags to Bechem pupils", time: "1d" },
     ];
     return (
@@ -586,19 +663,22 @@ function ClubNewsSidebar() {
 // ─── Filter Bar ───────────────────────────────────────────────────────────────
 const FILTERS = [
     { id: "all", label: "All Posts", icon: "ph:house-line-duotone" },
-    { id: "announcements", label: "Announcements", icon: "ph:megaphone-duotone" },
-    { id: "match", label: "Match Talk", icon: "ph:soccer-ball-duotone" },
-    { id: "community", label: "Community", icon: "ph:users-three-duotone" },
-    { id: "polls", label: "Polls", icon: "ph:chart-bar-horizontal-duotone" },
+    { id: "pinned", label: "Pinned", icon: "ph:push-pin-duotone" },
 ];
 
 // ─── Main Activity Feed ───────────────────────────────────────────────────────
 export default function ActivityFeed() {
-    const { user } = useAuth();
-    const [posts, setPosts] = useState<Post[]>(SEED_POSTS);
+    const { user, token } = useAuth();
+    const [posts, setPosts] = useState<Post[]>([]);
     const [activeFilter, setActiveFilter] = useState("all");
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [loadingCommentsFor, setLoadingCommentsFor] = useState<string | null>(null);
 
-    // Memoised so useCallback dependency arrays stay stable across renders
     const currentAuthor = useMemo(
         () =>
             user
@@ -607,28 +687,95 @@ export default function ActivityFeed() {
         [user]
     );
 
-    // ── Post new ──
-    const handleNewPost = useCallback((content: string) => {
-        const newPost: Post = {
-            id: `p-${Date.now()}`,
-            author: currentAuthor,
-            content,
-            createdAt: new Date().toISOString(),
-            reactions: [
-                { type: "like", count: 0, reacted: false },
-                { type: "fire", count: 0, reacted: false },
-                { type: "heart", count: 0, reacted: false },
-                { type: "celebrate", count: 0, reacted: false },
-            ],
-            comments: [],
-            commentsOpen: false,
-            type: "post",
-        };
-        setPosts((prev) => [newPost, ...prev]);
-    }, [currentAuthor]);
+    // ── Fetch posts on mount (wait for token since backend requires auth) ──
+    useEffect(() => {
+        if (!token) return;
+        let cancelled = false;
+        async function fetchPosts() {
+            try {
+                setIsLoading(true);
+                setError(null);
+                const res = await communityPostsService.list(token!, 1, 20);
+                if (cancelled) return;
+                const mapped = res.data.map((p) => mapBackendPost(p, user?.id));
+                setPosts(mapped);
+                setHasMore(res.page < res.totalPages);
+                setPage(res.page);
+            } catch (err: unknown) {
+                if (cancelled) return;
+                const e = err as { message?: string };
+                setError(e.message || "Failed to load posts");
+            } finally {
+                if (!cancelled) setIsLoading(false);
+            }
+        }
+        fetchPosts();
+        return () => { cancelled = true; };
+    }, [token, user?.id]);
 
-    // ── React ──
-    const handleReact = useCallback((postId: string, type: ReactionType) => {
+    // ── Load more posts ──
+    const handleLoadMore = useCallback(async () => {
+        if (isLoadingMore || !hasMore || !token) return;
+        setIsLoadingMore(true);
+        try {
+            const nextPage = page + 1;
+            const res = await communityPostsService.list(token!, nextPage, 20);
+            const mapped = res.data.map((p) => mapBackendPost(p, user?.id));
+            setPosts((prev) => [...prev, ...mapped]);
+            setPage(res.page);
+            setHasMore(res.page < res.totalPages);
+        } catch {
+            // Silent fail for load more
+        } finally {
+            setIsLoadingMore(false);
+        }
+    }, [isLoadingMore, hasMore, page, token, user?.id]);
+
+    // ── Post new ──
+    const handleNewPost = useCallback(async (content: string, imageUrl?: string) => {
+        if (!token) return;
+        setIsSubmitting(true);
+        try {
+            const body: { content: string; imageUrl?: string } = { content };
+            if (imageUrl) body.imageUrl = imageUrl;
+            const res = await communityPostsService.create(token, body);
+            const newPost = mapBackendPost(res.data, user?.id);
+            setPosts((prev) => [newPost, ...prev]);
+        } catch (err: unknown) {
+            const e = err as { message?: string };
+            console.error("Failed to create post:", e.message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    }, [token, user?.id]);
+
+    // ── Like (syncs with backend) ──
+    const handleReact = useCallback(async (postId: string, type: ReactionType) => {
+        // Only "like" type syncs with backend; other reaction types are client-only visual
+        if (type === "like" && token) {
+            try {
+                const res = await communityPostsService.like(token, postId);
+                setPosts((prev) =>
+                    prev.map((p) => {
+                        if (p.id !== postId) return p;
+                        return {
+                            ...p,
+                            reactions: p.reactions.map((r) => {
+                                if (r.type === "like") {
+                                    return { ...r, count: res.liked ? r.count + 1 : r.count - 1, reacted: res.liked };
+                                }
+                                return r;
+                            }),
+                        };
+                    })
+                );
+                return;
+            } catch {
+                // Fall through to optimistic update
+            }
+        }
+
+        // Optimistic client-side update for non-like reactions
         setPosts((prev) =>
             prev.map((p) => {
                 if (p.id !== postId) return p;
@@ -638,79 +785,103 @@ export default function ActivityFeed() {
                         if (r.type === type) {
                             return { ...r, count: r.reacted ? r.count - 1 : r.count + 1, reacted: !r.reacted };
                         }
-                        // Deselect other reactions
                         return r.reacted ? { ...r, count: r.count - 1, reacted: false } : r;
                     }),
                 };
             })
         );
-    }, []);
+    }, [token]);
 
-    // ── Toggle comments ──
-    const handleToggleComments = useCallback((postId: string) => {
-        setPosts((prev) =>
-            prev.map((p) => (p.id === postId ? { ...p, commentsOpen: !p.commentsOpen } : p))
-        );
-    }, []);
+    // ── Toggle comments (fetch from API on first open) ──
+    const handleToggleComments = useCallback(async (postId: string) => {
+        const post = posts.find((p) => p.id === postId);
+        if (!post) return;
+
+        if (post.commentsOpen) {
+            // Just close
+            setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, commentsOpen: false } : p)));
+            return;
+        }
+
+        // Open and fetch comments if not already loaded
+        if (post.comments.length === 0 && (post.commentsCount ?? 0) > 0) {
+            setLoadingCommentsFor(postId);
+            try {
+                const res = await commentsService.list(token!, "fan_post", postId);
+                const mapped = res.data.map((c) => mapBackendComment(c, user?.id));
+                setPosts((prev) =>
+                    prev.map((p) =>
+                        p.id === postId ? { ...p, comments: mapped, commentsOpen: true } : p
+                    )
+                );
+            } catch {
+                // Open with empty comments on error
+                setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, commentsOpen: true } : p)));
+            } finally {
+                setLoadingCommentsFor(null);
+            }
+        } else {
+            setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, commentsOpen: true } : p)));
+        }
+    }, [posts, user?.id]);
 
     // ── Add comment ──
-    const handleAddComment = useCallback((postId: string, content: string) => {
-        const newComment: Comment = {
-            id: `c-${Date.now()}`,
-            author: currentAuthor,
-            content,
-            createdAt: new Date().toISOString(),
-            likes: 0,
-            likedByMe: false,
-        };
-        setPosts((prev) =>
-            prev.map((p) => {
-                if (p.id !== postId) return p;
-                return { ...p, comments: [...p.comments, newComment], commentsOpen: true };
-            })
-        );
-    }, [currentAuthor]);
+    const handleAddComment = useCallback(async (postId: string, content: string) => {
+        if (!token) return;
+        try {
+            const res = await commentsService.create(token, {
+                content,
+                entityType: "fan_post",
+                entityId: postId,
+            });
+            const newComment = mapBackendComment(res.data, user?.id);
+            setPosts((prev) =>
+                prev.map((p) => {
+                    if (p.id !== postId) return p;
+                    return {
+                        ...p,
+                        comments: [...p.comments, newComment],
+                        commentsOpen: true,
+                        commentsCount: (p.commentsCount ?? p.comments.length) + 1,
+                    };
+                })
+            );
+        } catch (err: unknown) {
+            const e = err as { message?: string };
+            console.error("Failed to add comment:", e.message);
+        }
+    }, [token, user?.id]);
 
     // ── Like comment ──
-    const handleLikeComment = useCallback((postId: string, commentId: string) => {
-        setPosts((prev) =>
-            prev.map((p) => {
-                if (p.id !== postId) return p;
-                return {
-                    ...p,
-                    comments: p.comments.map((c) => {
-                        if (c.id !== commentId) return c;
-                        return { ...c, likes: c.likedByMe ? c.likes - 1 : c.likes + 1, likedByMe: !c.likedByMe };
-                    }),
-                };
-            })
-        );
-    }, []);
-
-    // ── Vote on poll ──
-    const handleVote = useCallback((postId: string, optionId: string) => {
-        setPosts((prev) =>
-            prev.map((p) => {
-                if (p.id !== postId) return p;
-                return {
-                    ...p,
-                    pollOptions: p.pollOptions?.map((o) => ({
-                        ...o,
-                        votes: o.id === optionId ? o.votes + 1 : o.votes,
-                        votedByMe: o.id === optionId,
-                    })),
-                };
-            })
-        );
-    }, []);
+    const handleLikeComment = useCallback(async (postId: string, commentId: string) => {
+        if (!token) return;
+        try {
+            const res = await commentsService.like(token, commentId);
+            setPosts((prev) =>
+                prev.map((p) => {
+                    if (p.id !== postId) return p;
+                    return {
+                        ...p,
+                        comments: p.comments.map((c) => {
+                            if (c.id !== commentId) return c;
+                            return {
+                                ...c,
+                                likes: res.liked ? c.likes + 1 : c.likes - 1,
+                                likedByMe: res.liked,
+                            };
+                        }),
+                    };
+                })
+            );
+        } catch {
+            // Silent fail
+        }
+    }, [token]);
 
     // ── Apply filter ──
     const filteredPosts = posts.filter((p) => {
         if (activeFilter === "all") return true;
-        if (activeFilter === "announcements") return p.type === "announcement";
-        if (activeFilter === "polls") return p.type === "poll";
-        if (activeFilter === "community") return p.tags?.some((t) => ["community", "youth"].includes(t));
-        if (activeFilter === "match") return p.tags?.some((t) => ["match-day", "match-review", "away-game"].includes(t));
+        if (activeFilter === "pinned") return p.pinned;
         return true;
     });
 
@@ -726,8 +897,10 @@ export default function ActivityFeed() {
             <div className="flex gap-6 relative">
                 {/* ── Feed Column ─────────────────────────── */}
                 <div className="flex-1 min-w-0 space-y-4">
-                    {/* Compose */}
-                    <ComposeBox onPost={handleNewPost} author={currentAuthor} />
+                    {/* Compose (only for authenticated users) */}
+                    {user && (
+                        <ComposeBox onPost={handleNewPost} author={currentAuthor} isSubmitting={isSubmitting} />
+                    )}
 
                     {/* Filter tabs */}
                     <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
@@ -746,36 +919,73 @@ export default function ActivityFeed() {
                         ))}
                     </div>
 
-                    {/* Posts */}
-                    <div className="space-y-4">
-                        <AnimatePresence initial={false}>
-                            {filteredPosts.map((post) => (
-                                <PostCard
-                                    key={post.id}
-                                    post={post}
-                                    currentAuthor={currentAuthor}
-                                    onReact={handleReact}
-                                    onToggleComments={handleToggleComments}
-                                    onAddComment={handleAddComment}
-                                    onLikeComment={handleLikeComment}
-                                    onVote={handleVote}
-                                />
-                            ))}
-                        </AnimatePresence>
+                    {/* Loading state */}
+                    {isLoading && (
+                        <div className="flex flex-col items-center justify-center py-16 gap-3">
+                            <Icon icon="line-md:loading-twotone-loop" className="w-10 h-10 text-primary" />
+                            <p className="text-sm text-neutral-400 font-medium">Loading posts...</p>
+                        </div>
+                    )}
 
-                        {filteredPosts.length === 0 && (
-                            <div className="text-center py-16 text-neutral-400">
-                                <Icon icon="ph:chat-slash-duotone" className="w-12 h-12 mx-auto mb-3 text-neutral-300" />
-                                <p className="text-sm font-medium">No posts in this category yet.</p>
-                                <p className="text-xs mt-1">Be the first to post something!</p>
-                            </div>
-                        )}
-                    </div>
+                    {/* Error state */}
+                    {error && !isLoading && (
+                        <div className="text-center py-12 bg-red-50 rounded-2xl border border-red-100">
+                            <Icon icon="ph:warning-circle-duotone" className="w-10 h-10 mx-auto mb-3 text-red-400" />
+                            <p className="text-sm font-medium text-red-600">{error}</p>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="mt-3 px-4 py-2 text-xs font-bold text-red-600 border border-red-200 rounded-xl hover:bg-red-100 transition-all"
+                            >
+                                Try Again
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Posts */}
+                    {!isLoading && !error && (
+                        <div className="space-y-4">
+                            <AnimatePresence initial={false}>
+                                {filteredPosts.map((post) => (
+                                    <PostCard
+                                        key={post.id}
+                                        post={post}
+                                        currentAuthor={currentAuthor}
+                                        onReact={handleReact}
+                                        onToggleComments={handleToggleComments}
+                                        onAddComment={handleAddComment}
+                                        onLikeComment={handleLikeComment}
+                                        isLoadingComments={loadingCommentsFor === post.id}
+                                    />
+                                ))}
+                            </AnimatePresence>
+
+                            {filteredPosts.length === 0 && (
+                                <div className="text-center py-16 text-neutral-400">
+                                    <Icon icon="ph:chat-slash-duotone" className="w-12 h-12 mx-auto mb-3 text-neutral-300" />
+                                    <p className="text-sm font-medium">No posts yet.</p>
+                                    <p className="text-xs mt-1">Be the first to post something!</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Load more */}
-                    <button className="w-full py-3 text-xs font-bold text-neutral-500 hover:text-primary border border-dashed border-neutral-200 hover:border-primary/30 rounded-xl transition-all">
-                        Load older posts
-                    </button>
+                    {!isLoading && !error && hasMore && (
+                        <button
+                            onClick={handleLoadMore}
+                            disabled={isLoadingMore}
+                            className="w-full py-3 text-xs font-bold text-neutral-500 hover:text-primary border border-dashed border-neutral-200 hover:border-primary/30 rounded-xl transition-all"
+                        >
+                            {isLoadingMore ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <Icon icon="line-md:loading-twotone-loop" className="w-4 h-4" />
+                                    Loading...
+                                </span>
+                            ) : (
+                                "Load older posts"
+                            )}
+                        </button>
+                    )}
                 </div>
 
                 {/* ── Sidebar ──────────────────────────────── */}

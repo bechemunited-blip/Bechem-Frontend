@@ -5,10 +5,55 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title("Content")
     .items([
+      // Community Section
       S.listItem()
-        .title("Community Projects")
+        .title("Community")
         .child(
-          S.documentTypeList("communityProject").title("Community Projects")
+          S.list()
+            .title("Community")
+            .items([
+              S.listItem()
+                .title("Community Projects")
+                .child(
+                  S.documentTypeList("communityProject").title("Community Projects")
+                ),
+              S.listItem()
+                .title("Fan Posts")
+                .child(
+                  S.documentTypeList("fanPost")
+                    .title("Fan Posts")
+                    .defaultOrdering([{ field: "_createdAt", direction: "desc" }])
+                ),
+              S.listItem()
+                .title("Comments")
+                .child(
+                  S.documentTypeList("comment")
+                    .title("Comments")
+                    .defaultOrdering([{ field: "_createdAt", direction: "desc" }])
+                ),
+              S.listItem()
+                .title("Polls")
+                .child(
+                  S.documentTypeList("poll").title("Polls")
+                ),
+              S.listItem()
+                .title("Poll Votes")
+                .child(
+                  S.documentTypeList("pollVote").title("Poll Votes")
+                ),
+              S.listItem()
+                .title("Community Events")
+                .child(
+                  S.documentTypeList("communityEvent")
+                    .title("Community Events")
+                    .defaultOrdering([{ field: "eventDate", direction: "desc" }])
+                ),
+              S.listItem()
+                .title("Event RSVPs")
+                .child(
+                  S.documentTypeList("eventRsvp").title("Event RSVPs")
+                ),
+            ])
         ),
       // Settings Section
       S.listItem()

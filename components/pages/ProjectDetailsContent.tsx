@@ -236,7 +236,7 @@ export default function ProjectDetailsContent({
                     </div>
 
                     {/* Community Reactions & Comments */}
-                    <ProjectComments projectTitle={project.title} />
+                    <ProjectComments projectId={project._id} projectTitle={project.title} />
 
                 </div>
 

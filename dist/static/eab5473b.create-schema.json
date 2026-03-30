@@ -1,0 +1,6401 @@
+[
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "rows": 3,
+        "name": "excerpt",
+        "type": "text"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "featuredImage",
+        "type": "image"
+      },
+      {
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "i18nTitleKey": "inputs.portable-text.annotation.link",
+                  "options": {
+                    "modal": {
+                      "type": "popover"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^tel$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": true,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "description": "A valid web, email, phone, or relative link.",
+                      "name": "href",
+                      "type": "url",
+                      "title": "Link"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Italic"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                },
+                {
+                  "value": "underline",
+                  "title": "Underline"
+                },
+                {
+                  "value": "strike-through",
+                  "title": "Strike"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "content",
+        "type": "array"
+      },
+      {
+        "name": "author",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "authorImage",
+        "type": "image",
+        "title": "Image of Author"
+      },
+      {
+        "name": "readTime",
+        "type": "number",
+        "title": "Read Time (minutes)"
+      },
+      {
+        "name": "publishedAt",
+        "type": "datetime",
+        "title": "Published Date"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Club News",
+              "value": "Club News"
+            },
+            {
+              "title": "Player News",
+              "value": "Player News"
+            },
+            {
+              "title": "Transfer News",
+              "value": "Transfer News"
+            },
+            {
+              "title": "Match Report",
+              "value": "Match Report"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "Club News",
+                  "Player News",
+                  "Transfer News",
+                  "Match Report"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "initialValue": false,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "⭐ Maximum 4 featured articles allowed (1 large hero + 3 smaller cards). Unfeature an existing article before featuring a new one.",
+        "name": "isFeatured",
+        "type": "boolean",
+        "title": "Featured Article"
+      }
+    ],
+    "name": "news",
+    "type": "document",
+    "title": "News Articles"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string",
+        "title": "Product Name"
+      },
+      {
+        "options": {
+          "source": "name",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image",
+        "title": "Product Image"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 4
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "options": {
+              "hotspot": true
+            },
+            "type": "image"
+          }
+        ],
+        "name": "otherImages",
+        "type": "array"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "price",
+        "type": "number",
+        "title": "Price (GH₵)"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Jerseys & Kits",
+              "value": "jerseys"
+            },
+            {
+              "title": "Lifestyle & Casual",
+              "value": "lifestyle"
+            },
+            {
+              "title": "Accessories",
+              "value": "accessories"
+            }
+          ]
+        },
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Home Jersey",
+              "value": "home-jersey"
+            },
+            {
+              "title": "Away Jersey",
+              "value": "away-jersey"
+            },
+            {
+              "title": "Training Kit",
+              "value": "training-kit"
+            },
+            {
+              "title": "Other",
+              "value": "other"
+            }
+          ]
+        },
+        "description": "Specify if this is a home jersey, away jersey, or training kit for homepage display",
+        "hidden": "conditional",
+        "name": "productType",
+        "type": "string"
+      },
+      {
+        "description": "Short title shown on product cards (e.g., 'Home Jersey'). If empty, uses full product name.",
+        "name": "displayTitle",
+        "type": "string",
+        "title": "Display Title (for cards)"
+      },
+      {
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "options": {
+          "list": [
+            "S",
+            "M",
+            "L",
+            "XL",
+            "2XL"
+          ]
+        },
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "sizes",
+        "type": "array",
+        "title": "Available Sizes"
+      },
+      {
+        "initialValue": true,
+        "name": "inStock",
+        "type": "boolean"
+      }
+    ],
+    "name": "product",
+    "type": "document",
+    "title": "Store Products"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "fullName",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              },
+              {
+                "flag": "max",
+                "constraint": 99
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "jerseyNumber",
+        "type": "number"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Goalkeeper",
+              "value": "goalkeeper"
+            },
+            {
+              "title": "Defender",
+              "value": "defender"
+            },
+            {
+              "title": "Midfielder",
+              "value": "midfielder"
+            },
+            {
+              "title": "Forward",
+              "value": "forward"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "goalkeeper",
+                  "defender",
+                  "midfielder",
+                  "forward"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "position",
+        "type": "string"
+      },
+      {
+        "description": "eg., Center-Back, Left Winger",
+        "name": "positionDetail",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "photo",
+        "type": "image",
+        "title": "Player Photo"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "photoBanner",
+        "type": "image",
+        "title": "Player Photo Banner"
+      },
+      {
+        "rows": 5,
+        "name": "biography",
+        "type": "text"
+      },
+      {
+        "fields": [
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "facebook",
+            "type": "url"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "instagram",
+            "type": "url"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "twitter",
+            "type": "url"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "tiktok",
+            "type": "url",
+            "title": "TikTok"
+          }
+        ],
+        "name": "socialMedia",
+        "type": "object"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "dateOfBirth",
+        "type": "date",
+        "title": "Date of Birth"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "nationality",
+        "type": "string"
+      },
+      {
+        "name": "height",
+        "type": "number",
+        "title": "Height (m)"
+      },
+      {
+        "options": {
+          "list": [
+            "Left",
+            "Right",
+            "Both"
+          ]
+        },
+        "name": "strongFoot",
+        "type": "string"
+      },
+      {
+        "fields": [
+          {
+            "name": "matchesPlayed",
+            "type": "number"
+          },
+          {
+            "name": "goalsScored",
+            "type": "number"
+          },
+          {
+            "name": "assists",
+            "type": "number"
+          },
+          {
+            "name": "minutesPlayed",
+            "type": "number"
+          },
+          {
+            "name": "speedIn30Meters",
+            "type": "number",
+            "title": "Speed in 30 Meters"
+          },
+          {
+            "name": "yellowCards",
+            "type": "number"
+          },
+          {
+            "name": "redCards",
+            "type": "number"
+          }
+        ],
+        "name": "commonStatistics",
+        "type": "object"
+      },
+      {
+        "fields": [
+          {
+            "name": "cleanSheets",
+            "type": "number"
+          },
+          {
+            "name": "saves",
+            "type": "number"
+          },
+          {
+            "name": "goalsConceded",
+            "type": "number"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "goalkeeperStats",
+        "type": "object",
+        "title": "Goalkeeper Statistics"
+      },
+      {
+        "fields": [
+          {
+            "name": "tacklesAndInterceptions",
+            "type": "number",
+            "title": "Tackles & Interceptions"
+          },
+          {
+            "name": "blocks",
+            "type": "number"
+          },
+          {
+            "name": "clearances",
+            "type": "number"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "defenderStats",
+        "type": "object",
+        "title": "Defender Statistics"
+      },
+      {
+        "fields": [
+          {
+            "name": "shotsOnTarget",
+            "type": "number",
+            "title": "Shots on Target"
+          },
+          {
+            "name": "tacklesAndInterceptions",
+            "type": "number",
+            "title": "Tackles & Interceptions"
+          },
+          {
+            "name": "dribbles",
+            "type": "number",
+            "title": "Successful Dribbles"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "midfielderStats",
+        "type": "object",
+        "title": "Midfielder Statistics"
+      },
+      {
+        "fields": [
+          {
+            "name": "shotsOnTarget",
+            "type": "number",
+            "title": "Shots on Target"
+          },
+          {
+            "name": "tacklesAndInterceptions",
+            "type": "number",
+            "title": "Tackles & Interceptions"
+          },
+          {
+            "name": "dribbles",
+            "type": "number",
+            "title": "Successful Dribbles"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "forwardStats",
+        "type": "object",
+        "title": "Forward Statistics"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "initialValue": true,
+                "name": "isGPLClub",
+                "type": "boolean",
+                "title": "Is this a Ghana Premier League Club?"
+              },
+              {
+                "to": [
+                  {
+                    "type": "gplClub"
+                  }
+                ],
+                "hidden": "conditional",
+                "name": "gplClubReference",
+                "type": "reference",
+                "title": "Select GPL Club"
+              },
+              {
+                "hidden": "conditional",
+                "name": "customClubName",
+                "type": "string",
+                "title": "Club Name"
+              },
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "hidden": "conditional",
+                "name": "customClubLogo",
+                "type": "image",
+                "title": "Upload Club Logo"
+              },
+              {
+                "options": {
+                  "list": [
+                    {
+                      "title": "Goalkeeper",
+                      "value": "goalkeeper"
+                    },
+                    {
+                      "title": "Defender",
+                      "value": "defender"
+                    },
+                    {
+                      "title": "Midfielder",
+                      "value": "midfielder"
+                    },
+                    {
+                      "title": "Forward",
+                      "value": "forward"
+                    }
+                  ]
+                },
+                "name": "role",
+                "type": "string",
+                "title": "Role/Position"
+              },
+              {
+                "name": "startYear",
+                "type": "number"
+              },
+              {
+                "name": "endYear",
+                "type": "number"
+              },
+              {
+                "initialValue": false,
+                "name": "isCurrent",
+                "type": "boolean",
+                "title": "Current Club"
+              },
+              {
+                "of": [
+                  {
+                    "type": "string"
+                  }
+                ],
+                "name": "achievements",
+                "type": "array"
+              }
+            ],
+            "type": "object",
+            "name": "careerEntry"
+          }
+        ],
+        "name": "careerExperience",
+        "type": "array",
+        "title": "Professional Career"
+      }
+    ],
+    "name": "player",
+    "type": "document",
+    "title": "Player Information"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "clubName",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "clubLogo",
+        "type": "image"
+      },
+      {
+        "name": "founded",
+        "type": "number",
+        "title": "Year Founded"
+      },
+      {
+        "name": "stadium",
+        "type": "string",
+        "title": "Home Stadium"
+      },
+      {
+        "initialValue": true,
+        "name": "isActive",
+        "type": "boolean",
+        "title": "Currently in GPL"
+      }
+    ],
+    "name": "gplClub",
+    "type": "document",
+    "title": "Ghana Premier League Clubs"
+  },
+  {
+    "description": "Football competitions and tournaments (GPL, FA Cup, etc.)",
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Full name (e.g., Ghana Premier League)",
+        "name": "name",
+        "type": "string",
+        "title": "Competition Name"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Abbreviated name (e.g., GPL)",
+        "name": "shortName",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "icon",
+        "type": "image",
+        "title": "Competition Icon/Logo"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "League",
+              "value": "league"
+            },
+            {
+              "title": "Cup",
+              "value": "cup"
+            },
+            {
+              "title": "Friendly",
+              "value": "friendly"
+            },
+            {
+              "title": "Tournament",
+              "value": "tournament"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "league",
+                  "cup",
+                  "friendly",
+                  "tournament"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "competitionType",
+        "type": "string"
+      },
+      {
+        "initialValue": true,
+        "description": "Is this competition currently active?",
+        "name": "isActive",
+        "type": "boolean",
+        "title": "Active"
+      }
+    ],
+    "name": "competition",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "A descriptive title for this image",
+        "name": "title",
+        "type": "string",
+        "title": "Image Title/Caption"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "image",
+        "type": "image"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Describe the image for accessibility (SEO)",
+        "name": "altText",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Date this photo was taken or posted",
+        "name": "uploadDate",
+        "type": "datetime",
+        "title": "Upload/Event Date"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Match Day",
+              "value": "match-day"
+            },
+            {
+              "title": "Team Photos",
+              "value": "team-photos"
+            },
+            {
+              "title": "Trophy Moments",
+              "value": "trophy-moments"
+            },
+            {
+              "title": "Our Fans",
+              "value": "our-fans"
+            },
+            {
+              "title": "Training Session",
+              "value": "training-session"
+            },
+            {
+              "title": "Behind the Scenes",
+              "value": "behind-the-scenes"
+            }
+          ],
+          "layout": "dropdown"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "match-day",
+                  "team-photos",
+                  "trophy-moments",
+                  "our-fans",
+                  "training-session",
+                  "behind-the-scenes"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "initialValue": false,
+        "description": "⭐ Mark as featured to show in the hero section of Gallery page",
+        "name": "isFeatured",
+        "type": "boolean",
+        "title": "Featured Image"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Priority for featured images (1 = center big image, 2-7 = side images). Only applies if marked as featured.",
+        "hidden": "conditional",
+        "name": "featuredPriority",
+        "type": "number",
+        "title": "Featured Priority (1-7)"
+      }
+    ],
+    "name": "galleryImage",
+    "type": "document",
+    "title": "Gallery Images"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string",
+        "title": "Facility Name"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 60
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Short descriptive phrase (e.g., \"Where Champions Train\", \"Strategic Hub\", etc.)",
+        "name": "tag",
+        "type": "string"
+      },
+      {
+        "rows": 4,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "image",
+        "type": "image",
+        "title": "Facility Image"
+      },
+      {
+        "description": "Standard facility information (optional fields)",
+        "fields": [
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "min",
+                    "constraint": 1900
+                  },
+                  {
+                    "flag": "max",
+                    "constraint": 2100
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "description": "Year the facility was founded or established",
+            "name": "since",
+            "type": "number",
+            "title": "Since (Year Established)"
+          },
+          {
+            "description": "Physical location of the facility",
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "min",
+                    "constraint": 0
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "description": "Maximum capacity (e.g., stadium seating, training ground capacity)",
+            "name": "capacity",
+            "type": "number"
+          }
+        ],
+        "name": "features",
+        "type": "object",
+        "title": "Basic Specifications"
+      },
+      {
+        "description": "Add custom specifications for this facility",
+        "of": [
+          {
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Add a title for the specification",
+                "name": "title",
+                "type": "string",
+                "title": "Specification Title"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Add the corresponding value/details",
+                "name": "value",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "additionalSpecifications",
+        "type": "array"
+      }
+    ],
+    "name": "facility",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string",
+        "title": "Full Name"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "President & Owner",
+              "value": "president"
+            },
+            {
+              "title": "CEO",
+              "value": "ceo"
+            },
+            {
+              "title": "Administrative Manager",
+              "value": "administrativeManager"
+            },
+            {
+              "title": "Head Coach",
+              "value": "headCoach"
+            },
+            {
+              "title": "Team Manager",
+              "value": "teamManager"
+            },
+            {
+              "title": "Public Relations Officer",
+              "value": "publicRelationsOfficer"
+            },
+            {
+              "title": "Other",
+              "value": "other"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "president",
+                  "ceo",
+                  "administrativeManager",
+                  "headCoach",
+                  "teamManager",
+                  "publicRelationsOfficer",
+                  "other"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "role",
+        "type": "string"
+      },
+      {
+        "description": "If 'Other' is selected, specify the role here",
+        "hidden": "conditional",
+        "name": "customRole",
+        "type": "string",
+        "title": "Custom Role Title"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image",
+        "title": "Profile Image"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Rich text content. Use the 'Highlight' button to style specific text with primary color.",
+        "of": [
+          {
+            "marks": {
+              "annotations": [],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "medium",
+                  "title": "Medium"
+                },
+                {
+                  "value": "em",
+                  "title": "Emphasis"
+                },
+                {
+                  "value": "highlight",
+                  "title": "Highlight (Primary Color)"
+                }
+              ]
+            },
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "bio",
+        "type": "array",
+        "title": "Biography"
+      },
+      {
+        "fields": [
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "linkedIn",
+            "type": "url",
+            "title": "LinkedIn URL"
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "title": "Email Address"
+          },
+          {
+            "description": "Phone number with country code (e.g., +233545464169)",
+            "name": "phone",
+            "type": "string",
+            "title": "Phone Number"
+          }
+        ],
+        "name": "socialMediaLinks",
+        "type": "object"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              },
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Order in which this item should appear (lower numbers appear first)",
+        "name": "order",
+        "type": "number",
+        "title": "Display Order"
+      }
+    ],
+    "name": "staffMember",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "to": [
+          {
+            "type": "wallOfFameCategory"
+          }
+        ],
+        "name": "category",
+        "type": "reference"
+      },
+      {
+        "description": "In this format: '2016' 0R '2011-12' ",
+        "name": "period",
+        "type": "string",
+        "title": "Period/Years"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image",
+        "title": "Profile Image"
+      },
+      {
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              },
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Order within this category (lower numbers appear first)",
+        "name": "order",
+        "type": "number",
+        "title": "Display Order"
+      }
+    ],
+    "name": "wallOfFame",
+    "type": "document",
+    "title": "Wall of Fame"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "YouTube, Vimeo, or other video platform URL",
+        "name": "videoUrl",
+        "type": "url",
+        "title": "Video URL"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Auto-filled from YouTube or enter manually",
+        "name": "title",
+        "type": "string",
+        "title": "Video Title"
+      },
+      {
+        "description": "Auto-filled from YouTube or enter manually",
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Select the competition (GPL, FA Cup, etc.)",
+        "to": [
+          {
+            "type": "competition"
+          }
+        ],
+        "name": "competition",
+        "type": "reference"
+      },
+      {
+        "placeholder": "Matchday 13",
+        "description": "e.g., Matchday 13, Round 16, etc.",
+        "name": "matchday",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Match Highlight",
+              "value": "matchHighlight"
+            },
+            {
+              "title": "Player Highlight",
+              "value": "playerHighlight"
+            }
+          ]
+        },
+        "name": "videoType",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "description": "Upload a custom thumbnail (optional - YouTube thumbnail will be used if not provided)",
+        "name": "thumbnail",
+        "type": "image"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Auto-filled from YouTube API - used if no custom thumbnail is uploaded",
+        "readOnly": true,
+        "name": "thumbnailUrl",
+        "type": "url",
+        "title": "YouTube Thumbnail URL"
+      },
+      {
+        "description": "Auto-filled from YouTube or enter manually",
+        "name": "publishedAt",
+        "type": "datetime"
+      },
+      {
+        "description": "Auto-filled from YouTube (e.g., @BUFC-TV)",
+        "name": "channel",
+        "type": "string"
+      },
+      {
+        "description": "If this is a player highlight video",
+        "to": [
+          {
+            "type": "player"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "relatedPlayer",
+        "type": "reference"
+      }
+    ],
+    "name": "matchHighlight",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "competition",
+        "type": "string"
+      },
+      {
+        "name": "matchday",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "homeTeam",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "awayTeam",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "matchDate",
+        "type": "datetime",
+        "title": "Match Date & Time"
+      },
+      {
+        "name": "venue",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Upcoming",
+              "value": "upcoming"
+            },
+            {
+              "title": "Live",
+              "value": "live"
+            },
+            {
+              "title": "Finished",
+              "value": "finished"
+            },
+            {
+              "title": "Postponed",
+              "value": "postponed"
+            },
+            {
+              "title": "Cancelled",
+              "value": "cancelled"
+            }
+          ]
+        },
+        "initialValue": "upcoming",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "upcoming",
+                  "live",
+                  "finished",
+                  "postponed",
+                  "cancelled"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "status",
+        "type": "string",
+        "title": "Match Status"
+      },
+      {
+        "hidden": "conditional",
+        "name": "homeScore",
+        "type": "number"
+      },
+      {
+        "hidden": "conditional",
+        "name": "awayScore",
+        "type": "number"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "player",
+                "type": "string",
+                "title": "Player Name"
+              },
+              {
+                "name": "minute",
+                "type": "string"
+              },
+              {
+                "options": {
+                  "list": [
+                    {
+                      "title": "Home",
+                      "value": "home"
+                    },
+                    {
+                      "title": "Away",
+                      "value": "away"
+                    }
+                  ]
+                },
+                "name": "team",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "scorers",
+        "type": "array",
+        "title": "Goal Scorers"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "ticketUrl",
+        "type": "url",
+        "title": "Ticket Purchase URL"
+      },
+      {
+        "to": [
+          {
+            "type": "matchHighlight"
+          }
+        ],
+        "hidden": "conditional",
+        "name": "highlightVideo",
+        "type": "reference"
+      }
+    ],
+    "name": "matchFixture",
+    "type": "document",
+    "title": "Match/Fixture"
+  },
+  {
+    "fields": [
+      {
+        "description": "Short contextual label (e.g., \"Super Cup Finalist\")",
+        "name": "tag",
+        "type": "string",
+        "title": "Tag/Label"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g., Ghana FA Cup Winners",
+        "name": "name",
+        "type": "string",
+        "title": "Trophy Name"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g., 2016, 2010-11, 2017",
+        "name": "year",
+        "type": "string",
+        "title": "Year/Season"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "image",
+        "type": "image",
+        "title": "Trophy Image"
+      },
+      {
+        "rows": 4,
+        "description": "Brief description of the achievement",
+        "name": "description",
+        "type": "text"
+      }
+    ],
+    "name": "trophy",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 60
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "E.g., \"First Premier League Goal\", \"Goals - Top Scorer\"",
+        "name": "title",
+        "type": "string",
+        "title": "Record Title"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Individual Achievement",
+              "value": "individual"
+            },
+            {
+              "title": "Team Achievement",
+              "value": "team"
+            },
+            {
+              "title": "Season Milestone",
+              "value": "season"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "individual",
+                  "team",
+                  "season"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "recordType",
+        "type": "string"
+      },
+      {
+        "description": "Name of the player who achieved the record",
+        "hidden": "conditional",
+        "name": "player",
+        "type": "string",
+        "title": "Player (if individual record)"
+      },
+      {
+        "placeholder": "E.g., \"Unbeaten Home Record (2020)\", \"Team Effort (2019)\"",
+        "description": "Use for team efforts, seasons, or other contexts",
+        "hidden": "conditional",
+        "name": "customSubtext",
+        "type": "string",
+        "title": "Custom Subtext (if not a player)"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1900
+              },
+              {
+                "flag": "max",
+                "constraint": 2100
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "year",
+        "type": "number",
+        "title": "Year Achieved"
+      }
+    ],
+    "name": "recordBreaker",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g., 'Who We Are', 'Our Foundation', 'The Hunters Mentality'",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Rich text content. Use the 'Highlight' button to style specific text with primary color.",
+        "of": [
+          {
+            "marks": {
+              "annotations": [],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "medium",
+                  "title": "Medium"
+                },
+                {
+                  "value": "em",
+                  "title": "Emphasis"
+                },
+                {
+                  "value": "highlight",
+                  "title": "Highlight (Primary Color)"
+                }
+              ]
+            },
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "subtext",
+        "type": "array"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Enter the Iconify icon name (e.g., 'mdi:shield-outline', 'heroicons:star'). Find icons at:",
+        "name": "icon",
+        "type": "string",
+        "title": "Icon Name"
+      },
+      {
+        "initialValue": "https://icon-sets.iconify.design/",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Quick access link to find icons",
+        "readOnly": true,
+        "name": "iconifyUrl",
+        "type": "url",
+        "title": "Iconify Icons Website"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              },
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Order in which this item should appear (lower numbers appear first)",
+        "name": "order",
+        "type": "number",
+        "title": "Display Order"
+      }
+    ],
+    "name": "clubIdentityInfo",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g., 'Vision', 'Mission', 'Commitment'",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Description of this pillar",
+        "name": "subtext",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Enter the Iconify icon name (e.g., 'mdi:target', 'heroicons:trophy'). Find icons at:",
+        "name": "icon",
+        "type": "string",
+        "title": "Icon Name"
+      },
+      {
+        "initialValue": "https://icon-sets.iconify.design/",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Quick access link to find icons",
+        "readOnly": true,
+        "name": "iconifyUrl",
+        "type": "url",
+        "title": "Iconify Icons Website"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              },
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Order in which this item should appear (lower numbers appear first)",
+        "name": "order",
+        "type": "number",
+        "title": "Display Order"
+      }
+    ],
+    "name": "clubPillar",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g., 'Club Legends', 'Great Coaches', 'Captains of Honor'",
+        "name": "title",
+        "type": "string",
+        "title": "Category Title"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Description of this category",
+        "name": "subtext",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "URL-friendly identifier for this category",
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              },
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Order in which this category should appear (lower numbers appear first)",
+        "name": "order",
+        "type": "number",
+        "title": "Display Order"
+      }
+    ],
+    "name": "wallOfFameCategory",
+    "type": "document",
+    "title": "Wall of Fame Category"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g., 'Club Foundation Era', 'Glory Years', 'International Recognition'",
+        "name": "title",
+        "type": "string",
+        "title": "Era Title"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1900
+              },
+              {
+                "flag": "max",
+                "constraint": 2100
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The year this era began (e.g., 1966)",
+        "name": "startYear",
+        "type": "number"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1900
+              },
+              {
+                "flag": "max",
+                "constraint": 2100
+              },
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The year this era ended (e.g., 2006). Use current year for ongoing eras.",
+        "name": "endYear",
+        "type": "number"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Rich text content describing this era. Use formatting buttons for emphasis.",
+        "of": [
+          {
+            "marks": {
+              "annotations": [],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "medium",
+                  "title": "Medium"
+                },
+                {
+                  "value": "em",
+                  "title": "Emphasis"
+                },
+                {
+                  "value": "highlight",
+                  "title": "Highlight (Primary Color)"
+                }
+              ]
+            },
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "description",
+        "type": "array"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Enter the Iconify icon name (e.g., 'mdi:trophy', 'heroicons:star'). Find icons at:https://icon-sets.iconify.design/",
+        "name": "icon",
+        "type": "string",
+        "title": "Icon Name"
+      },
+      {
+        "initialValue": "https://icon-sets.iconify.design/",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Quick access link to find icons",
+        "readOnly": true,
+        "name": "iconifyUrl",
+        "type": "url",
+        "title": "Iconify Icons Website"
+      }
+    ],
+    "name": "history",
+    "type": "document",
+    "title": "History Timeline"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "rank",
+        "type": "number"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "teamName",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "teamLogo",
+        "type": "image"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "played",
+        "type": "number"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "won",
+        "type": "number"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "drawn",
+        "type": "number"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "lost",
+        "type": "number"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "gf",
+        "type": "number",
+        "title": "Goals For (GF)"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "ga",
+        "type": "number",
+        "title": "Goals Against (GA)"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "gd",
+        "type": "number",
+        "title": "Goal Difference (GD)"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "points",
+        "type": "number"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Win (W)",
+              "value": "W"
+            },
+            {
+              "title": "Draw (D)",
+              "value": "D"
+            },
+            {
+              "title": "Loss (L)",
+              "value": "L"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "W",
+                  "D",
+                  "L"
+                ]
+              },
+              {
+                "flag": "max",
+                "constraint": 5
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "lastFive",
+        "type": "array",
+        "title": "Last 5 Games"
+      },
+      {
+        "initialValue": false,
+        "description": "If true, this row will be highlighted in the table.",
+        "name": "isHighlight",
+        "type": "boolean",
+        "title": "Highlight Team (Bechem United)"
+      }
+    ],
+    "name": "leagueStandings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string",
+        "title": "Project Title"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Ongoing",
+              "value": "Ongoing"
+            },
+            {
+              "title": "Completed",
+              "value": "Completed"
+            },
+            {
+              "title": "Upcoming",
+              "value": "Upcoming"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "Ongoing",
+                  "Completed",
+                  "Upcoming"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Education",
+              "value": "Education"
+            },
+            {
+              "title": "Health",
+              "value": "Health"
+            },
+            {
+              "title": "Youth Development",
+              "value": "Youth Development"
+            },
+            {
+              "title": "Infrastructure",
+              "value": "Infrastructure"
+            },
+            {
+              "title": "Environment",
+              "value": "Environment"
+            },
+            {
+              "title": "Other",
+              "value": "Other"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "Education",
+                  "Health",
+                  "Youth Development",
+                  "Infrastructure",
+                  "Environment",
+                  "Other"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "featuredImage",
+        "type": "image"
+      },
+      {
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "i18nTitleKey": "inputs.portable-text.annotation.link",
+                  "options": {
+                    "modal": {
+                      "type": "popover"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^tel$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": true,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "description": "A valid web, email, phone, or relative link.",
+                      "name": "href",
+                      "type": "url",
+                      "title": "Link"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Italic"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                },
+                {
+                  "value": "underline",
+                  "title": "Underline"
+                },
+                {
+                  "value": "strike-through",
+                  "title": "Strike"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "description",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "options": {
+              "hotspot": true
+            },
+            "type": "image"
+          }
+        ],
+        "name": "gallery",
+        "type": "array",
+        "title": "Project Gallery"
+      },
+      {
+        "name": "startDate",
+        "type": "date"
+      },
+      {
+        "name": "endDate",
+        "type": "date"
+      },
+      {
+        "name": "location",
+        "type": "string"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "partners",
+        "type": "array"
+      },
+      {
+        "fields": [
+          {
+            "name": "peopleBenefited",
+            "type": "string"
+          },
+          {
+            "name": "fundsRaised",
+            "type": "string"
+          },
+          {
+            "name": "volunteerHours",
+            "type": "string"
+          },
+          {
+            "name": "customMetric",
+            "type": "string",
+            "title": "Custom Metric Label"
+          },
+          {
+            "name": "customValue",
+            "type": "string",
+            "title": "Custom Metric Value"
+          }
+        ],
+        "name": "impactMetrics",
+        "type": "object"
+      },
+      {
+        "initialValue": false,
+        "name": "isFeatured",
+        "type": "boolean",
+        "title": "Featured Project"
+      }
+    ],
+    "name": "communityProject",
+    "type": "document",
+    "title": "Community Projects"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 500
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "content",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "authorId",
+        "type": "string",
+        "title": "Author ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "authorName",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "imageUrl",
+        "type": "url",
+        "title": "Image URL"
+      },
+      {
+        "name": "fixtureId",
+        "type": "string",
+        "title": "Fixture ID"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "likes",
+        "type": "array"
+      },
+      {
+        "initialValue": 0,
+        "name": "likesCount",
+        "type": "number"
+      },
+      {
+        "initialValue": 0,
+        "name": "commentsCount",
+        "type": "number"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "flaggedBy",
+        "type": "array"
+      },
+      {
+        "initialValue": 0,
+        "name": "flagCount",
+        "type": "number"
+      },
+      {
+        "initialValue": false,
+        "name": "isPinned",
+        "type": "boolean"
+      },
+      {
+        "initialValue": false,
+        "name": "isHidden",
+        "type": "boolean"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Active",
+              "value": "active"
+            },
+            {
+              "title": "Hidden",
+              "value": "hidden"
+            },
+            {
+              "title": "Deleted",
+              "value": "deleted"
+            }
+          ]
+        },
+        "initialValue": "active",
+        "name": "status",
+        "type": "string"
+      }
+    ],
+    "name": "fanPost",
+    "type": "document",
+    "title": "Fan Posts"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 300
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "content",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "authorId",
+        "type": "string",
+        "title": "Author ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "authorName",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Fan Post",
+              "value": "fan_post"
+            },
+            {
+              "title": "Community Project",
+              "value": "community_project"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "fan_post",
+                  "community_project"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "entityType",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "entityId",
+        "type": "string",
+        "title": "Entity ID"
+      },
+      {
+        "name": "parentCommentId",
+        "type": "string",
+        "title": "Parent Comment ID"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "likes",
+        "type": "array"
+      },
+      {
+        "initialValue": 0,
+        "name": "likesCount",
+        "type": "number"
+      },
+      {
+        "initialValue": false,
+        "name": "isHidden",
+        "type": "boolean"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Active",
+              "value": "active"
+            },
+            {
+              "title": "Hidden",
+              "value": "hidden"
+            },
+            {
+              "title": "Deleted",
+              "value": "deleted"
+            }
+          ]
+        },
+        "initialValue": "active",
+        "name": "status",
+        "type": "string"
+      }
+    ],
+    "name": "comment",
+    "type": "document",
+    "title": "Comments"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 500
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "question",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 2
+              },
+              {
+                "flag": "max",
+                "constraint": 10
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "key",
+                "type": "string"
+              },
+              {
+                "name": "text",
+                "type": "string"
+              },
+              {
+                "initialValue": 0,
+                "name": "voteCount",
+                "type": "number"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "options",
+        "type": "array"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Single Choice",
+              "value": "single_choice"
+            },
+            {
+              "title": "Multiple Choice",
+              "value": "multiple_choice"
+            }
+          ]
+        },
+        "initialValue": "single_choice",
+        "name": "type",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "createdBy",
+        "type": "string"
+      },
+      {
+        "name": "expiresAt",
+        "type": "datetime"
+      },
+      {
+        "initialValue": false,
+        "name": "showResultsBeforeEnd",
+        "type": "boolean"
+      },
+      {
+        "initialValue": 0,
+        "name": "totalVotes",
+        "type": "number"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Draft",
+              "value": "draft"
+            },
+            {
+              "title": "Active",
+              "value": "active"
+            },
+            {
+              "title": "Closed",
+              "value": "closed"
+            }
+          ]
+        },
+        "initialValue": "draft",
+        "name": "status",
+        "type": "string"
+      }
+    ],
+    "name": "poll",
+    "type": "document",
+    "title": "Polls"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "pollId",
+        "type": "string",
+        "title": "Poll ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "userId",
+        "type": "string",
+        "title": "User ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "selectedOptions",
+        "type": "array"
+      },
+      {
+        "name": "votedAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "pollVote",
+    "type": "document",
+    "title": "Poll Votes"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 200
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 5000
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "name": "location",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "eventDate",
+        "type": "datetime"
+      },
+      {
+        "name": "endDate",
+        "type": "datetime"
+      },
+      {
+        "name": "capacity",
+        "type": "number"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "imageUrl",
+        "type": "url",
+        "title": "Image URL"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "createdBy",
+        "type": "string"
+      },
+      {
+        "name": "rsvpDeadline",
+        "type": "datetime",
+        "title": "RSVP Deadline"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Upcoming",
+              "value": "upcoming"
+            },
+            {
+              "title": "Ongoing",
+              "value": "ongoing"
+            },
+            {
+              "title": "Completed",
+              "value": "completed"
+            },
+            {
+              "title": "Cancelled",
+              "value": "cancelled"
+            }
+          ]
+        },
+        "initialValue": "upcoming",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "initialValue": false,
+        "name": "waitlistEnabled",
+        "type": "boolean"
+      },
+      {
+        "initialValue": 0,
+        "name": "attendeeCount",
+        "type": "number"
+      },
+      {
+        "initialValue": 0,
+        "name": "waitlistCount",
+        "type": "number"
+      }
+    ],
+    "name": "communityEvent",
+    "type": "document",
+    "title": "Community Events"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "eventId",
+        "type": "string",
+        "title": "Event ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "userId",
+        "type": "string",
+        "title": "User ID"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Attending",
+              "value": "attending"
+            },
+            {
+              "title": "Not Attending",
+              "value": "not_attending"
+            },
+            {
+              "title": "Maybe",
+              "value": "maybe"
+            },
+            {
+              "title": "Waitlist",
+              "value": "waitlist"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "attending",
+                  "not_attending",
+                  "maybe",
+                  "waitlist"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "name": "respondedAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "eventRsvp",
+    "type": "document",
+    "title": "Event RSVPs"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Home Page Settings",
+        "description": "This is a singleton document - only one should exist",
+        "readOnly": true,
+        "name": "title",
+        "type": "string",
+        "title": "Settings Title"
+      },
+      {
+        "initialValue": "THE HUNTERS",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Main bold heading for the homepage hero section (e.g., THE HUNTERS)",
+        "name": "heroHeading",
+        "type": "string"
+      },
+      {
+        "initialValue": "Vision with Precision",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Subtitle or slogan below the main heading",
+        "name": "heroSubheading",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "description": "Persistent background image for the homepage hero. If not provided, will fallback to latest news image.",
+        "name": "heroImage",
+        "type": "image",
+        "title": "Hero Background Image"
+      },
+      {
+        "initialValue": "Join the Hunt",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "heroCtaText",
+        "type": "string",
+        "title": "Hero Primary CTA Text"
+      },
+      {
+        "initialValue": "/community",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Where the primary hero button should link to",
+        "name": "heroCtaLink",
+        "type": "string",
+        "title": "Hero Primary CTA Link"
+      },
+      {
+        "initialValue": "Tickets",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "heroSecondaryCtaText",
+        "type": "string",
+        "title": "Hero Secondary CTA Text"
+      },
+      {
+        "initialValue": "/tickets",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Where the secondary hero button should link to",
+        "name": "heroSecondaryCtaLink",
+        "type": "string",
+        "title": "Hero Secondary CTA Link"
+      },
+      {
+        "initialValue": "Full Story",
+        "description": "This field is being replaced by the custom hero fields above.",
+        "name": "heroNewsBtnText",
+        "type": "string",
+        "title": "Hero News Button Text (OBSOLETE)"
+      },
+      {
+        "initialValue": "LATEST FROM HUNTERS",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "newsSectionTitle",
+        "type": "string",
+        "title": "News Section Title?"
+      },
+      {
+        "initialValue": "Stay updated with the latest news, match reports, and announcements from Bechem United FC",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "newsSectionSubtext",
+        "type": "string"
+      },
+      {
+        "initialValue": "NEWS & UPDATES",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "newsContentTitle",
+        "type": "string",
+        "title": "News & Updates Content Title"
+      },
+      {
+        "rows": 5,
+        "initialValue": "Welcome to the home of Bechem United FC news. Here you'll find everything from match day coverage and player spotlights to community initiatives and youth development programs that define who we are.\n\nThe Hunters are more than a team—we're a community. Stay updated with news that matters, from the pitch to the people who make this club special.",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "newsContentSubtext",
+        "type": "text",
+        "title": "News & Updates Content Subtext"
+      },
+      {
+        "initialValue": "Discover More",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "newsContentBtnText",
+        "type": "string",
+        "title": "News & Updates Content Button Text"
+      },
+      {
+        "initialValue": "UPCOMING FIXTURES",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "fixtureSectionTitle",
+        "type": "string",
+        "title": "Fixtures Section Title"
+      },
+      {
+        "initialValue": "Don't miss a moment of the action. Check out our upcoming matches and get your tickets early.",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "fixtureSectionSubtext",
+        "type": "string",
+        "title": "Fixtures Section Subtext"
+      },
+      {
+        "initialValue": "What's Ahead",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "moreFixturesTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Mark your calendar for these upcoming clashes",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "moreFixturesSubtext",
+        "type": "string"
+      },
+      {
+        "initialValue": "Full Schedule",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "fixtureSectionBtnText",
+        "type": "string",
+        "title": "Fixtures Section Button Text"
+      },
+      {
+        "initialValue": "OUR CLUB STORE",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "shopSectionTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Discover the latest official merchandise, new collections, and exclusive Bechem United FC store updates.",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "shopSectionSubtext",
+        "type": "string"
+      },
+      {
+        "initialValue": "Visit Store",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "shopSectionBtnText",
+        "type": "string",
+        "title": "Shop Section Button Text"
+      },
+      {
+        "initialValue": "PHOTO HIGHLIGHTS",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "photoHighlightsTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Relive the best moments from recent matches, training sessions, and club events.",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "photoHighlightsSubtext",
+        "type": "string"
+      },
+      {
+        "initialValue": "Explore Gallery",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "photoHighlightsBtnText",
+        "type": "string",
+        "title": "Photo Highlights Button Text"
+      }
+    ],
+    "name": "homePageSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Contact Us Settings",
+        "description": "This is a singleton document - only one should exist",
+        "readOnly": true,
+        "name": "title",
+        "type": "string",
+        "title": "Settings Title"
+      },
+      {
+        "initialValue": "Contact Us",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "pageTitle",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "pageBannerImage",
+        "type": "image"
+      },
+      {
+        "initialValue": "Contact Information",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "contactFormTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Have questions or feedback? Reach out to us to learn more about Bechem United FC, stay updated on the latest news.",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "contactFormSubtext",
+        "type": "string"
+      },
+      {
+        "initialValue": "+233 (545) 464169",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Phone number with country code (e.g., +233 (545) 464169)",
+        "name": "phoneNumber",
+        "type": "string"
+      },
+      {
+        "initialValue": "info@bechemunited.com",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "emailAddress",
+        "type": "string"
+      },
+      {
+        "initialValue": "Bechem House, Kojo Thompson Rd P.O Box GP 21474, Adabraka, Accra Ghana",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "locationAddress",
+        "type": "string"
+      },
+      {
+        "initialValue": "Locate Us",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "mapSectionTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Locate us easily on the map and reach out for more information about Bechem United FC",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "mapSectionSubtext",
+        "type": "string"
+      }
+    ],
+    "name": "contactUsSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Gallery Page Settings",
+        "description": "This is a singleton document - only one should exist",
+        "readOnly": true,
+        "name": "title",
+        "type": "string",
+        "title": "Settings Title"
+      },
+      {
+        "initialValue": "Gallery",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "pageTitle",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Hero banner image at the top of the gallery page",
+        "name": "pageBannerImage",
+        "type": "image"
+      },
+      {
+        "initialValue": "Featured Moments",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "featuredSectionTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Our most memorable matches, celebrations, and behind-the-scenes moments",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "featuredSectionSubtext",
+        "type": "text"
+      },
+      {
+        "initialValue": "Load More Photos",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "loadMoreButtonText",
+        "type": "string"
+      }
+    ],
+    "name": "galleryPageSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Footer Settings",
+        "description": "This is a singleton document - only one should exist",
+        "readOnly": true,
+        "name": "title",
+        "type": "string",
+        "title": "Settings Title"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Main description text that appears under the logo",
+        "name": "description",
+        "type": "text",
+        "title": "Footer Description"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "fields": [
+          {
+            "name": "location",
+            "type": "string"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "locationUrlOnMap",
+            "type": "url",
+            "title": "Location URL on Map"
+          }
+        ],
+        "name": "location",
+        "type": "object"
+      },
+      {
+        "description": "Phone number with country code (e.g., +233 (545) 464169)",
+        "name": "phone",
+        "type": "string",
+        "title": "Phone Number"
+      },
+      {
+        "name": "email",
+        "type": "string",
+        "title": "Email Address"
+      },
+      {
+        "fields": [
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "facebook",
+            "type": "url",
+            "title": "Facebook URL"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "twitter",
+            "type": "url",
+            "title": "Twitter/X URL"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "youtube",
+            "type": "url",
+            "title": "YouTube URL"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "instagram",
+            "type": "url",
+            "title": "Instagram URL"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "pinterest",
+            "type": "url",
+            "title": "Pinterest URL"
+          }
+        ],
+        "name": "socialMedia",
+        "type": "object",
+        "title": "Social Media Links"
+      }
+    ],
+    "name": "footerSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Sponsor Settings",
+        "description": "This is a singleton document - only one should exist",
+        "readOnly": true,
+        "name": "title",
+        "type": "string",
+        "title": "Settings Title"
+      },
+      {
+        "initialValue": "Proudly Partnered With Top Brands In Ghana.",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The main heading text for the sponsor section",
+        "name": "sponsorSectionTitle",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Add sponsor logos here",
+        "of": [
+          {
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Name of the sponsor company",
+                "name": "name",
+                "type": "string",
+                "title": "Sponsor Name"
+              },
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Upload the sponsor's logo (preferably transparent PNG / SVG)",
+                "name": "logo",
+                "type": "image",
+                "title": "Sponsor Logo"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "uri",
+                        "constraint": {
+                          "options": {
+                            "scheme": [
+                              "/^http$/",
+                              "/^https$/"
+                            ],
+                            "allowRelative": false,
+                            "relativeOnly": false,
+                            "allowCredentials": false
+                          }
+                        }
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Optional: Link to sponsor's website or any social media",
+                "name": "website",
+                "type": "url",
+                "title": "Website URL"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      },
+                      {
+                        "flag": "min",
+                        "constraint": 1
+                      },
+                      {
+                        "flag": "custom"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Order in which the logo should appear (lower numbers first). Must be unique.",
+                "name": "order",
+                "type": "number",
+                "title": "Display Order"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "sponsors",
+        "type": "array",
+        "title": "Sponsor Logos"
+      }
+    ],
+    "name": "sponsorSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Live Matches & Replays Settings",
+        "description": "This is a singleton document - only one should exist",
+        "readOnly": true,
+        "name": "title",
+        "type": "string",
+        "title": "Settings Title"
+      },
+      {
+        "initialValue": "LIVE MATCHES & REPLAYS",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The main heading for this section",
+        "name": "liveSectionTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Tune in for live action or revisit your favorite goals and celebrations.",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Description text below the heading",
+        "name": "liveSectionSubtext",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "description": "Thumbnail image for the video player",
+        "name": "videoThumbnail",
+        "type": "image",
+        "title": "Video Thumbnail Image"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "YouTube or external video URL for live/replay matches",
+        "name": "videoUrl",
+        "type": "url",
+        "title": "Video URL"
+      },
+      {
+        "initialValue": false,
+        "description": "Display 'LIVE' badge on the video thumbnail. If false, shows 'LAST MATCH' badge.",
+        "name": "isLive",
+        "type": "boolean",
+        "title": "Show Live Indicator"
+      },
+      {
+        "initialValue": "Watch Past Matches",
+        "description": "Text for the button that links to live matches or replays.",
+        "name": "liveSectionBtnText",
+        "type": "string",
+        "title": "Live Section Button Text"
+      }
+    ],
+    "name": "liveMatchesSettings",
+    "type": "document",
+    "title": "Live Matches & Replays Settings"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Newsletter Settings",
+        "description": "This is a singleton document - only one should exist",
+        "readOnly": true,
+        "name": "title",
+        "type": "string",
+        "title": "Settings Title"
+      },
+      {
+        "initialValue": "Never Miss A Moment",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Main heading for newsletter section",
+        "name": "sectionTitle",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Image to display as the background of the newsletter section",
+        "name": "sectionImage",
+        "type": "image"
+      },
+      {
+        "initialValue": "Get match updates, news, and exclusive offers delivered to your inbox.",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Description text for newsletter signup",
+        "name": "sectionSubtext",
+        "type": "string"
+      },
+      {
+        "initialValue": "Enter your email",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "inputPlaceholder",
+        "type": "string",
+        "title": "Email Input Placeholder"
+      },
+      {
+        "initialValue": "Subscribe",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "buttonText",
+        "type": "string",
+        "title": "Subscribe Button Text"
+      }
+    ],
+    "name": "newsletterSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Bechem United Football Club",
+        "name": "clubName",
+        "type": "string"
+      },
+      {
+        "initialValue": "The Hunters",
+        "name": "nickname",
+        "type": "string"
+      },
+      {
+        "initialValue": "Vision With Precision",
+        "name": "slogan",
+        "type": "string"
+      },
+      {
+        "initialValue": "Pride of Ahafo Region. Follow the Hunters as we compete in the Ghana Premier League and build a legacy of excellence both on and off the pitch.",
+        "name": "tagline",
+        "type": "text"
+      },
+      {
+        "initialValue": 1966,
+        "name": "founded",
+        "type": "number",
+        "title": "Year Founded"
+      },
+      {
+        "initialValue": "Bechem, Ahafo Region",
+        "name": "location",
+        "type": "string"
+      },
+      {
+        "fields": [
+          {
+            "initialValue": "Purple",
+            "name": "primary",
+            "type": "string",
+            "title": "Primary Color"
+          },
+          {
+            "initialValue": "Yellow",
+            "name": "secondary",
+            "type": "string",
+            "title": "Secondary Color"
+          },
+          {
+            "initialValue": "We wear our distinctive purple and yellow colors with immense pride, displaying them boldly on the football pitch. These vibrant colors represent our community, our passion, and our unwavering spirit in every match we play",
+            "name": "description",
+            "type": "text",
+            "title": "Colors Description"
+          }
+        ],
+        "name": "colors",
+        "type": "object",
+        "title": "Club Colors"
+      },
+      {
+        "initialValue": "Bechem United Football Club is a professional Ghanaian football club based in Bechem, Ahafo Region. We embody the pride and passion of our community, living by our slogan, Vision With Precision, which reflects our commitment to moving forward with purpose and exacting standards.",
+        "name": "whoWeAre",
+        "type": "text"
+      },
+      {
+        "initialValue": "Our nickname The Hunters reflects our aggressive, never-give-up mentality on the pitch. We embody the spirit of determination and excellence that has made us one of Ghana's most respected football institutions.",
+        "name": "huntersMentality",
+        "type": "text",
+        "title": "The Hunters Mentality"
+      },
+      {
+        "initialValue": "To become a dominant force in African football — competing on the continental stage and elevating the pride of our community.",
+        "name": "vision",
+        "type": "text"
+      },
+      {
+        "initialValue": "To build a winning culture grounded in discipline, hard work, and strategic leadership",
+        "name": "mission",
+        "type": "text"
+      },
+      {
+        "initialValue": "Develop elite talent, secure long-term excellence, and build lasting legacy for the club",
+        "name": "commitment",
+        "type": "text"
+      },
+      {
+        "initialValue": [
+          {
+            "title": "Club Foundation Era",
+            "period": "1966 - 2006",
+            "icon": "mdi:seedling",
+            "description": "Bechem United Football Club was born in 1966 in Bechem, Ahafo Region. Nicknamed The Hunters, we began our journey with a vision to represent our community through passionate, determined football that would unite and inspire our people. \n\nOver four decades, we built our identity in the lower divisions, established fierce rivalries with Brong Ahafo Stars and Berekum Chelsea, and created a loyal fanbase. These foundational years saw us develop the aggressive, never-give-up mentality that defines the Hunters to this day, laying the groundwork for our eventual rise to national prominence."
+          },
+          {
+            "title": "International Recognition",
+            "period": "2007 - 2010",
+            "icon": "mynaui:globe-solid",
+            "description": "In 2007, our youth team traveled to Italy to compete in the prestigious Trofeo Karol Wojtyla tournament in Fiumicino, Province of Rome, Lazio region. This marked our first international appearance and demonstrated our commitment to youth development on the world stage.\n\nThese years focused on building infrastructure, strengthening our Division One campaigns, and preparing for the historic breakthrough that would come in 2011. We invested in player development, improved our training facilities, and set our sights firmly on Ghana's top flight, knowing that the Hunters belonged among the nation's elite."
+          },
+          {
+            "title": "Glory Years",
+            "period": "2011 - 2017",
+            "icon": "game-icons:trophy-cup",
+            "description": "September 2011 - Champions of Poly Tank Division One League Zone 1! We earned promotion to the Ghana Premier League, changing our club's trajectory forever. \n\nOn October 10, 2011, Eric Fordjour scored our historic first top-flight goal from the penalty spot against Aduana Stars. Richard Addae became our debut season hero with 11 goals, finishing 3rd in the entire league's scoring charts. \n\nThen came September 2016 at Cape Coast Stadium - our finest moment. Yaw Annor's memorable brace secured a 2-1 victory over Okwawu United, bringing home our first major national trophy, the Ghana FA Cup. \n\nIn 2017, we competed in the Ghana Super Cup final as runners-up, cementing our status among the nation's elite. From promoted club to national champions in just five years - this was the era that defined modern Bechem United.",
+            "keyAchievements": [
+              "Poly Tank Division One Zone 1 Champions (2010-11)",
+              "Ghana FA Cup Winners (2016)",
+              "Ghana Super Cup Runners-Up (2017)"
+            ]
+          },
+          {
+            "title": "Consolidation & Growth",
+            "period": "2018 - 2022",
+            "icon": "fluent:arrow-growth-24-filled",
+            "description": "A period of stability, strong leadership, and consistent Premier League competition. We were blessed with exceptional captains who embodied the Hunter spirit: Asante Agyemang (2017-2018), Daniel Egyin (2018-2019), Prince Asempa (2019-2020), and Moro Salifu (2020-2021), who later earned a move to Al Ittihad of Egypt - proving Bechem United is a pathway to international careers. \n\nWe attracted world-class coaching talent including Mohammed Adil Erradi (2015-2016), the mastermind behind our FA Cup triumph, and Romain Folz (2020), who brought European coaching methods and elevated our tactical approach to new professional standards. \n\nThese years established us as consistent competitors, focused on player development, and built the foundation for sustained success at the highest level of Ghanaian football."
+          }
+        ],
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "title",
+                "type": "string",
+                "title": "Era Title"
+              },
+              {
+                "name": "period",
+                "type": "string"
+              },
+              {
+                "name": "description",
+                "type": "text"
+              },
+              {
+                "description": "Iconify icon name (e.g., mdi:seedling)",
+                "name": "icon",
+                "type": "string"
+              },
+              {
+                "of": [
+                  {
+                    "type": "string"
+                  }
+                ],
+                "name": "keyAchievements",
+                "type": "array"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "historyEras",
+        "type": "array"
+      }
+    ],
+    "name": "clubIdentitySettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "News",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "pageTitle",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Hero banner image at the top of the news page",
+        "name": "pageBannerImage",
+        "type": "image",
+        "title": "News Page Banner Image"
+      },
+      {
+        "initialValue": "Featured News",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "featuredNewsSectionTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Find the most important and timely news about Bechem United FC",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "featuredNewsSectionSubtext",
+        "type": "string"
+      },
+      {
+        "initialValue": "Latest Updates",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "latestUpdatesSectionTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Catch up on recent news and developments from around the club",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "latestUpdatesSectionSubtext",
+        "type": "string"
+      }
+    ],
+    "name": "newsPageSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Bechem United FC",
+        "name": "clubNameOnBanner",
+        "type": "string",
+        "title": "Club Name on Banner"
+      },
+      {
+        "initialValue": "Vision With Precision",
+        "name": "clubSloganOnBanner",
+        "type": "string",
+        "title": "Club Slogan on Banner"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Hero banner image at the top of the club page",
+        "name": "clubPageBannerImage",
+        "type": "image"
+      },
+      {
+        "fields": [
+          {
+            "initialValue": "CLUB IDENTITY",
+            "name": "clubIdentityTitle",
+            "type": "string",
+            "title": "Club Identity Section Title"
+          },
+          {
+            "initialValue": "Get to know Bechem United FC - our history, values, and vision for the future",
+            "name": "clubIdentitySubtitle",
+            "type": "string",
+            "title": "Club Identity Section Subtitle"
+          },
+          {
+            "initialValue": "OUR PILLARS",
+            "name": "pillarsTitle",
+            "type": "string",
+            "title": "Pillars Section Title"
+          },
+          {
+            "initialValue": "The foundation that drives our pursuit of excellence",
+            "name": "pillarsSubtitle",
+            "type": "string",
+            "title": "Pillars Section Subtitle"
+          },
+          {
+            "initialValue": "THE TEAM BEHIND THE TEAM",
+            "name": "managementTitle",
+            "type": "string",
+            "title": "Management Section Title"
+          },
+          {
+            "initialValue": "Meet the leadership preserving our legacy and building our future since 1966",
+            "name": "managementSubtitle",
+            "type": "string",
+            "title": "Management Section Subtitle"
+          },
+          {
+            "initialValue": "OUR HISTORY",
+            "name": "historyTitle",
+            "type": "string",
+            "title": "History Section Title"
+          },
+          {
+            "initialValue": "From humble beginnings to FA Cup champions - the remarkable journey of the Hunters",
+            "name": "historySubtitle",
+            "type": "string",
+            "title": "History Section Subtitle"
+          },
+          {
+            "initialValue": "OUR FACILITIES",
+            "name": "facilitiesTitle",
+            "type": "string",
+            "title": "Facilities Section Title"
+          },
+          {
+            "initialValue": "World-class infrastructure where champions train and compete",
+            "name": "facilitiesSubtitle",
+            "type": "string",
+            "title": "Facilities Section Subtitle"
+          },
+          {
+            "initialValue": "TROPHY CABINET",
+            "name": "trophiesTitle",
+            "type": "string",
+            "title": "Trophy Cabinet Title"
+          },
+          {
+            "initialValue": "Celebrating our victories, milestones, and achievements since 1966",
+            "name": "trophiesSubtitle",
+            "type": "string",
+            "title": "Trophy Cabinet Subtitle"
+          },
+          {
+            "initialValue": "WALL OF FAME",
+            "name": "wallOfFameTitle",
+            "type": "string",
+            "title": "Wall of Fame Title"
+          },
+          {
+            "initialValue": "Our Heroes, Coaches & Captains",
+            "name": "wallOfFameSubtitle",
+            "type": "string",
+            "title": "Wall of Fame Subtitle"
+          }
+        ],
+        "name": "sections",
+        "type": "object",
+        "title": "Page Sections"
+      },
+      {
+        "description": "This section appears on all club page tabs (Profile, History, Facilities, Honors)",
+        "fields": [
+          {
+            "initialValue": "JOIN THE HUNTERS PACK",
+            "name": "title",
+            "type": "string",
+            "title": "Section Title"
+          },
+          {
+            "rows": 3,
+            "initialValue": "Become part of our legacy. Join The Hunters Pack and support our journey to greatness.",
+            "name": "description",
+            "type": "text"
+          },
+          {
+            "initialValue": "BECOME A MEMBER",
+            "name": "buttonText",
+            "type": "string"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "max",
+                    "constraint": 4
+                  },
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "description": "Exactly 4 images for the gallery (required)",
+            "of": [
+              {
+                "fields": [
+                  {
+                    "options": {
+                      "hotspot": true
+                    },
+                    "validation": [
+                      {
+                        "rules": [
+                          {
+                            "flag": "presence",
+                            "constraint": "required"
+                          }
+                        ],
+                        "level": "error"
+                      }
+                    ],
+                    "name": "image",
+                    "type": "image"
+                  },
+                  {
+                    "validation": [
+                      {
+                        "rules": [
+                          {
+                            "flag": "presence",
+                            "constraint": "required"
+                          },
+                          {
+                            "flag": "min",
+                            "constraint": 1
+                          },
+                          {
+                            "flag": "max",
+                            "constraint": 4
+                          }
+                        ],
+                        "level": "error"
+                      }
+                    ],
+                    "description": "Order in which this image should appear (1-4)",
+                    "name": "order",
+                    "type": "number",
+                    "title": "Display Order"
+                  }
+                ],
+                "type": "object"
+              }
+            ],
+            "name": "images",
+            "type": "array",
+            "title": "Gallery Images"
+          }
+        ],
+        "name": "joinHuntersPack",
+        "type": "object",
+        "title": "Join The Hunters Pack Section"
+      }
+    ],
+    "name": "clubPageSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Fixtures",
+        "name": "fixturesPageTitle",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "fixturesPageBannerImage",
+        "type": "image"
+      },
+      {
+        "initialValue": "What’s ahead",
+        "name": "upcomingFixturesTitle",
+        "type": "string",
+        "title": "Upcoming Fixtures Section Title"
+      },
+      {
+        "initialValue": "Mark your calendar for these upcoming clashes",
+        "name": "upcomingFixturesSubtext",
+        "type": "string",
+        "title": "Upcoming Fixtures Section Subtext"
+      },
+      {
+        "initialValue": "RESULTS",
+        "name": "resultsTitle",
+        "type": "string",
+        "title": "Results Section Title"
+      },
+      {
+        "initialValue": "Track our hunters' journey through the season",
+        "name": "resultsSubtext",
+        "type": "string",
+        "title": "Results Section Subtext"
+      },
+      {
+        "initialValue": "View More",
+        "name": "fixturesViewMoreText",
+        "type": "string"
+      },
+      {
+        "initialValue": "Stream live matches or watch highlights from previous games",
+        "name": "watchLiveCardText",
+        "type": "string"
+      },
+      {
+        "initialValue": "Watch Live",
+        "name": "watchLiveCtaText",
+        "type": "string",
+        "title": "Watch Live CTA Text"
+      },
+      {
+        "initialValue": "View Highlights",
+        "name": "highlightsCtaText",
+        "type": "string",
+        "title": "Highlights CTA Text"
+      }
+    ],
+    "name": "fixturesPageSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Past Highlights",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "pageTitle",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Hero banner image at the top of the past highlights page",
+        "name": "pageBanner",
+        "type": "image",
+        "title": "Page Banner Image"
+      },
+      {
+        "initialValue": "MATCH ARCHIVES",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "sectionTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Browse team or player highlights from this season and beyond",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "sectionSubtitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "View More",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "viewMoreText",
+        "type": "string",
+        "title": "View More Button Text"
+      },
+      {
+        "description": "Settings for the 'Watch Live' call-to-action card",
+        "fields": [
+          {
+            "initialValue": "Don't Miss The Action Live",
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "title",
+            "type": "string",
+            "title": "Card Title"
+          },
+          {
+            "initialValue": "Catch every goal, save, and celebration as it happens. Watch our matches live.",
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "description",
+            "type": "string",
+            "title": "Card Description"
+          },
+          {
+            "initialValue": "Watch Live Now",
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "buttonText",
+            "type": "string"
+          },
+          {
+            "initialValue": "fluent:live-24-regular",
+            "description": "Name of the icon to use for the watch live button (e.g., PlayIcon, LiveIcon)",
+            "name": "watchLiveBtnIconName",
+            "type": "string",
+            "title": "Watch Live Button Icon Name. Pick icons from Iconify (https://icon-sets.iconify.design/)"
+          },
+          {
+            "options": {
+              "hotspot": true
+            },
+            "description": "Background image for the watch live card",
+            "name": "backgroundImage",
+            "type": "image"
+          }
+        ],
+        "name": "watchLiveCard",
+        "type": "object"
+      }
+    ],
+    "name": "pastHighlightsSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Players",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "pageTitle",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Hero banner image at the top of the players page",
+        "name": "pageBanner",
+        "type": "image",
+        "title": "Page Banner Image"
+      },
+      {
+        "initialValue": "Search by name or jersey number",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "inputPlaceholderText",
+        "type": "string",
+        "title": "Search Input Placeholder Text"
+      }
+    ],
+    "name": "playersPageSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Shop",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "pageTitle",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "description": "Hero banner image at the top of the shop page",
+        "name": "pageBanner",
+        "type": "image",
+        "title": "Page Banner Image"
+      },
+      {
+        "initialValue": "OUR CLUB STORE",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "sectionTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Discover the latest official merchandise, new collections, and exclusive Bechem United FC store updates.",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "sectionSubtext",
+        "type": "string"
+      }
+    ],
+    "name": "shopPageSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Community Page Settings",
+        "description": "This is a singleton document - only one should exist",
+        "readOnly": true,
+        "name": "title",
+        "type": "string",
+        "title": "Settings Title"
+      },
+      {
+        "initialValue": "Join Our Community",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "heroTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Together we can achieve more",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "heroSubtitle",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "heroImage",
+        "type": "image",
+        "title": "Hero Background Image"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "heroVideoUrl",
+        "type": "url",
+        "title": "Hero Video URL (Optional)"
+      },
+      {
+        "initialValue": "Join Community",
+        "name": "joinButtonText",
+        "type": "string"
+      },
+      {
+        "initialValue": "Sign In",
+        "name": "signInButtonText",
+        "type": "string"
+      },
+      {
+        "initialValue": "Our Impact",
+        "name": "statsTitle",
+        "type": "string",
+        "title": "Stats Section Title"
+      },
+      {
+        "name": "statsSubtext",
+        "type": "string",
+        "title": "Stats Section Subtext"
+      },
+      {
+        "initialValue": "Featured Projects",
+        "name": "featuredProjectsTitle",
+        "type": "string"
+      },
+      {
+        "name": "featuredProjectsSubtext",
+        "type": "string"
+      },
+      {
+        "initialValue": "Buzz in the Community",
+        "name": "activityTeaserTitle",
+        "type": "string"
+      },
+      {
+        "name": "activityTeaserSubtext",
+        "type": "string"
+      },
+      {
+        "initialValue": "Why Join Us?",
+        "name": "benefitsTitle",
+        "type": "string",
+        "title": "Benefits Section Title"
+      },
+      {
+        "name": "benefitsSubtext",
+        "type": "string",
+        "title": "Benefits Section Subtext"
+      },
+      {
+        "initialValue": "Ready to make a difference?",
+        "name": "ctaTitle",
+        "type": "string",
+        "title": "CTA Banner Title"
+      },
+      {
+        "name": "ctaSubtext",
+        "type": "string",
+        "title": "CTA Banner Subtext"
+      },
+      {
+        "initialValue": "Get Involved Now",
+        "name": "ctaButtonText",
+        "type": "string",
+        "title": "CTA Button Text"
+      },
+      {
+        "initialValue": "Community Projects",
+        "name": "projectsPageTitle",
+        "type": "string"
+      },
+      {
+        "initialValue": "Explore our ongoing and completed initiatives driving positive change.",
+        "name": "projectsPageSubtitle",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "projectsPageImage",
+        "type": "image",
+        "title": "Projects Page Banner Image"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "label",
+                "type": "string"
+              },
+              {
+                "name": "value",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "statistics",
+        "type": "array"
+      },
+      {
+        "fields": [
+          {
+            "initialValue": "Hunters Hub",
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "initialValue": "Create Free Account",
+            "name": "buttonText",
+            "type": "string"
+          },
+          {
+            "name": "image",
+            "type": "image",
+            "title": "Card Header Image"
+          }
+        ],
+        "name": "huntersHub",
+        "type": "object",
+        "title": "Hunters Hub Details"
+      }
+    ],
+    "name": "communityPageSettings",
+    "type": "document"
+  }
+]

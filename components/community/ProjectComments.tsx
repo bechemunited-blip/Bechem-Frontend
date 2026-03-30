@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 import { useAuth } from "@/store/hooks/useAuth";
 import { useUI } from "@/store/hooks/useUI";
 import { getInitials, formatRelativeTime } from "@/lib/community/data";
+import { commentsService, BackendComment } from "@/lib/api/community-posts";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface ProjectComment {
@@ -22,60 +23,24 @@ interface ProjectComment {
     showReplies: boolean;
 }
 
-type CommentReaction = "👍" | "🔥" | "❤️" | "👏";
+// ─── Backend → Frontend Mapper ───────────────────────────────────────────────
+// Backend returns raw Sanity documents with flat authorId/authorName strings.
 
-// Seed data – would come from backend in production
-const SEED_COMMENTS: ProjectComment[] = [
-    {
-        id: "pc1",
-        authorId: "u-admin",
-        authorName: "Bechem United FC",
-        authorRole: "admin",
-        content: "We are thrilled by the community's response to this project! Your support is what drives us to keep doing more. 💛",
-        createdAt: new Date(Date.now() - 3 * 3600000).toISOString(),
-        likes: 34,
-        likedByMe: false,
-        replies: [],
-        showReplies: false,
-    },
-    {
-        id: "pc2",
-        authorId: "u-kwame",
-        authorName: "Kwame Boateng",
+function mapBackendComment(comment: BackendComment, currentUserId?: string): ProjectComment {
+    const userLiked = currentUserId ? comment.likes?.includes(currentUserId) : false;
+    return {
+        id: comment._id,
+        authorId: comment.authorId,
+        authorName: comment.authorName,
         authorRole: "fan",
-        content: "This is exactly the kind of initiative that makes me proud to be a Hunters fan. Full support from me and my family!",
-        createdAt: new Date(Date.now() - 5 * 3600000).toISOString(),
-        likes: 18,
-        likedByMe: false,
-        replies: [
-            {
-                id: "pc2-r1",
-                authorId: "u-ama",
-                authorName: "Ama Sarpong",
-                authorRole: "fan",
-                content: "Absolutely agree! We attended the launch day and it was amazing. Well done to the organising team 🙏",
-                createdAt: new Date(Date.now() - 4 * 3600000).toISOString(),
-                likes: 7,
-                likedByMe: false,
-                replies: [],
-                showReplies: false,
-            },
-        ],
+        content: comment.content,
+        createdAt: comment._createdAt,
+        likes: comment.likesCount ?? 0,
+        likedByMe: userLiked,
+        replies: (comment.replies || []).map((r) => mapBackendComment(r, currentUserId)),
         showReplies: false,
-    },
-    {
-        id: "pc3",
-        authorId: "u-kofi",
-        authorName: "Kofi Mensah",
-        authorRole: "fan",
-        content: "How can I get involved in the next phase? I'd love to volunteer on weekends.",
-        createdAt: new Date(Date.now() - 8 * 3600000).toISOString(),
-        likes: 5,
-        likedByMe: false,
-        replies: [],
-        showReplies: false,
-    },
-];
+    };
+}
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
 function Avatar({ name, avatar, role, size = "md" }: { name: string; avatar?: string; role: "admin" | "fan"; size?: "sm" | "md" }) {
@@ -173,7 +138,7 @@ function CommentItem({
                             <input
                                 autoFocus
                                 type="text"
-                                placeholder="Write a reply…"
+                                placeholder="Write a reply..."
                                 value={replyText}
                                 onChange={(e) => setReplyText(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && submitReply()}
@@ -218,100 +183,104 @@ function CommentItem({
     );
 }
 
-// ─── Quick Reaction Row ────────────────────────────────────────────────────────
-function QuickReactions({ onReact }: { onReact: (r: CommentReaction) => void }) {
-    const reactions: CommentReaction[] = ["👍", "🔥", "❤️", "👏"];
-    const [selected, setSelected] = useState<CommentReaction | null>(null);
-    const [counts] = useState({ "👍": 47, "🔥": 22, "❤️": 35, "👏": 14 });
-
-    return (
-        <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Quick React:</span>
-            <div className="flex gap-2">
-                {reactions.map((r) => (
-                    <button
-                        key={r}
-                        onClick={() => {
-                            const next = selected === r ? null : r;
-                            setSelected(next);
-                            if (next) onReact(r);
-                        }}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-all ${selected === r
-                            ? "bg-primary/10 border-primary/30 text-primary scale-105"
-                            : "bg-neutral-50 border-neutral-200 text-neutral-600 hover:border-primary/30 hover:bg-primary/5"
-                            }`}
-                    >
-                        <span className="text-base leading-none">{r}</span>
-                        <span>{counts[r] + (selected === r ? 1 : 0)}</span>
-                    </button>
-                ))}
-            </div>
-        </div>
-    );
-}
-
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function ProjectComments({ projectTitle }: { projectTitle: string }) {
-    const { user, isAuthenticated } = useAuth();
+export default function ProjectComments({ projectId, projectTitle }: { projectId: string; projectTitle: string }) {
+    const { user, token, isAuthenticated } = useAuth();
     const { openAuthModal } = useUI();
-    const [comments, setComments] = useState<ProjectComment[]>(SEED_COMMENTS);
+    const [comments, setComments] = useState<ProjectComment[]>([]);
     const [newComment, setNewComment] = useState("");
     const [sortBy, setSortBy] = useState<"newest" | "top">("newest");
+    const [isLoading, setIsLoading] = useState(true);
+    const [totalComments, setTotalComments] = useState(0);
+
+    // ── Fetch comments on mount (wait for token since backend requires auth) ──
+    useEffect(() => {
+        if (!token) {
+            setIsLoading(false);
+            return;
+        }
+        let cancelled = false;
+        async function fetchComments() {
+            try {
+                setIsLoading(true);
+                const res = await commentsService.list(token!, "community_project", projectId);
+                if (cancelled) return;
+                const mapped = res.data.map((c) => mapBackendComment(c, user?.id));
+                setComments(mapped);
+                setTotalComments(res.total);
+            } catch (err) {
+                console.error("Failed to load comments:", err);
+            } finally {
+                if (!cancelled) setIsLoading(false);
+            }
+        }
+        fetchComments();
+        return () => { cancelled = true; };
+    }, [token, projectId, user?.id]);
 
     // ── Add top-level comment ──
-    const handleAddComment = useCallback(() => {
-        if (!newComment.trim() || !user) return;
-        const c: ProjectComment = {
-            id: `pc-${Date.now()}`,
-            authorId: user.id,
-            authorName: user.name,
-            authorAvatar: user.avatar,
-            authorRole: user.role,
-            content: newComment.trim(),
-            createdAt: new Date().toISOString(),
-            likes: 0,
-            likedByMe: false,
-            replies: [],
-            showReplies: false,
-        };
-        setComments((prev) => [c, ...prev]);
-        setNewComment("");
-    }, [newComment, user]);
-
-    // ── Like any comment (top-level or reply) ──
-    const handleLike = useCallback((id: string) => {
-        const toggleLike = (list: ProjectComment[]): ProjectComment[] =>
-            list.map((c) => {
-                if (c.id === id) return { ...c, likes: c.likedByMe ? c.likes - 1 : c.likes + 1, likedByMe: !c.likedByMe };
-                return { ...c, replies: toggleLike(c.replies) };
+    const handleAddComment = useCallback(async () => {
+        if (!newComment.trim() || !token) return;
+        try {
+            const res = await commentsService.create(token, {
+                content: newComment.trim(),
+                entityType: "community_project",
+                entityId: projectId,
             });
-        setComments(toggleLike);
-    }, []);
+            const mapped = mapBackendComment(res.data, user?.id);
+            setComments((prev) => [mapped, ...prev]);
+            setTotalComments((prev) => prev + 1);
+            setNewComment("");
+        } catch (err) {
+            console.error("Failed to add comment:", err);
+        }
+    }, [newComment, token, projectId, user?.id]);
+
+    // ── Like any comment ──
+    const handleLike = useCallback(async (id: string) => {
+        if (!token) return;
+        try {
+            const res = await commentsService.like(token, id);
+            const updateLike = (list: ProjectComment[]): ProjectComment[] =>
+                list.map((c) => {
+                    if (c.id === id) {
+                        return {
+                            ...c,
+                            likes: res.liked ? c.likes + 1 : c.likes - 1,
+                            likedByMe: res.liked,
+                        };
+                    }
+                    return { ...c, replies: updateLike(c.replies) };
+                });
+            setComments(updateLike);
+        } catch {
+            // Silent fail
+        }
+    }, [token]);
 
     // ── Add reply ──
-    const handleReply = useCallback((parentId: string, content: string) => {
-        if (!user) return;
-        const reply: ProjectComment = {
-            id: `r-${Date.now()}`,
-            authorId: user.id,
-            authorName: user.name,
-            authorAvatar: user.avatar,
-            authorRole: user.role,
-            content,
-            createdAt: new Date().toISOString(),
-            likes: 0,
-            likedByMe: false,
-            replies: [],
-            showReplies: false,
-        };
-        setComments((prev) =>
-            prev.map((c) =>
-                c.id === parentId
-                    ? { ...c, replies: [...c.replies, reply], showReplies: true }
-                    : c
-            )
-        );
-    }, [user]);
+    const handleReply = useCallback(async (parentId: string, content: string) => {
+        if (!token) return;
+        try {
+            const res = await commentsService.create(token, {
+                content,
+                entityType: "community_project",
+                entityId: projectId,
+                parentCommentId: parentId,
+            });
+            const mapped = mapBackendComment(res.data, user?.id);
+            setComments((prev) =>
+                prev.map((c) =>
+                    c.id === parentId
+                        ? { ...c, replies: [...c.replies, mapped], showReplies: true }
+                        : c
+                )
+            );
+            setTotalComments((prev) => prev + 1);
+        } catch (err) {
+            console.error("Failed to add reply:", err);
+        }
+    }, [token, projectId, user?.id]);
 
     // ── Toggle replies ──
     const handleToggleReplies = useCallback((id: string) => {
@@ -326,6 +295,8 @@ export default function ProjectComments({ projectTitle }: { projectTitle: string
             : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
+    const displayTotal = comments.reduce((s, c) => s + 1 + c.replies.length, 0);
+
     return (
         <div className="mt-16 pt-8 border-t border-neutral-200">
             {/* Header */}
@@ -334,7 +305,7 @@ export default function ProjectComments({ projectTitle }: { projectTitle: string
                     <Icon icon="ph:chat-circle-dots-duotone" className="w-6 h-6 text-primary" />
                     Community Reactions
                     <span className="text-sm text-neutral-400 font-bold normal-case tracking-normal">
-                        ({comments.reduce((s, c) => s + 1 + c.replies.length, 0)})
+                        ({isLoading ? "..." : displayTotal})
                     </span>
                 </h3>
                 <div className="flex items-center gap-1 bg-neutral-100 p-1 rounded-full">
@@ -350,11 +321,6 @@ export default function ProjectComments({ projectTitle }: { projectTitle: string
                 </div>
             </div>
 
-            {/* Quick reactions (always visible) */}
-            <div className="mb-6">
-                <QuickReactions onReact={() => { }} />
-            </div>
-
             {/* Compose */}
             {isAuthenticated ? (
                 <div className="flex gap-3 mb-8">
@@ -362,7 +328,7 @@ export default function ProjectComments({ projectTitle }: { projectTitle: string
                     <div className="flex-1 flex gap-2">
                         <input
                             type="text"
-                            placeholder={`Share your thoughts on "${projectTitle}"…`}
+                            placeholder={`Share your thoughts on "${projectTitle}"...`}
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleAddComment()}
@@ -403,33 +369,45 @@ export default function ProjectComments({ projectTitle }: { projectTitle: string
                 </div>
             )}
 
-            {/* Comment list */}
-            <div className="space-y-6">
-                <AnimatePresence initial={false}>
-                    {sorted.map((comment) => (
-                        <motion.div
-                            key={comment.id}
-                            layout
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -8 }}
-                        >
-                            <CommentItem
-                                comment={comment}
-                                currentUserId={user?.id}
-                                onLike={handleLike}
-                                onReply={handleReply}
-                                onToggleReplies={handleToggleReplies}
-                            />
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
+            {/* Loading state */}
+            {isLoading && (
+                <div className="flex items-center justify-center py-12">
+                    <Icon icon="line-md:loading-twotone-loop" className="w-8 h-8 text-primary" />
+                </div>
+            )}
 
-                {/* Load more */}
-                <button className="w-full py-3 text-xs font-bold text-neutral-400 hover:text-primary border border-dashed border-neutral-200 hover:border-primary/30 rounded-xl transition-all">
-                    Load more comments
-                </button>
-            </div>
+            {/* Comment list */}
+            {!isLoading && (
+                <div className="space-y-6">
+                    <AnimatePresence initial={false}>
+                        {sorted.map((comment) => (
+                            <motion.div
+                                key={comment.id}
+                                layout
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -8 }}
+                            >
+                                <CommentItem
+                                    comment={comment}
+                                    currentUserId={user?.id}
+                                    onLike={handleLike}
+                                    onReply={handleReply}
+                                    onToggleReplies={handleToggleReplies}
+                                />
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+
+                    {comments.length === 0 && (
+                        <div className="text-center py-12 text-neutral-400">
+                            <Icon icon="ph:chat-circle-dashed-duotone" className="w-10 h-10 mx-auto mb-3 text-neutral-300" />
+                            <p className="text-sm font-medium">No comments yet.</p>
+                            <p className="text-xs mt-1">Be the first to share your thoughts!</p>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

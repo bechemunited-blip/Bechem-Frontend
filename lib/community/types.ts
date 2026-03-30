@@ -38,6 +38,7 @@ export interface Post {
     pollOptions?: { id: string; text: string; votes: number; votedByMe: boolean }[];
     pinned?: boolean;
     tags?: string[];
+    commentsCount?: number;
 }
 
 export interface FeedState {

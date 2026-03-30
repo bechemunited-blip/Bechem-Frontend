@@ -32,6 +32,12 @@ import { historyType } from "./history";
 import leagueStandings from "./leagueStandings";
 import { communityProjectType } from "./communityProject";
 import { communityPageSettingsType } from "./communityPageSettings";
+import { fanPostType } from "./fanPost";
+import { commentType } from "./comment";
+import { pollType } from "./poll";
+import { pollVoteType } from "./pollVote";
+import { communityEventType } from "./communityEvent";
+import { eventRsvpType } from "./eventRsvp";
 
 export const schemaTypes = [
   // Content Types
@@ -55,6 +61,12 @@ export const schemaTypes = [
 
   leagueStandings,
   communityProjectType,
+  fanPostType,
+  commentType,
+  pollType,
+  pollVoteType,
+  communityEventType,
+  eventRsvpType,
 
   // Settings (Singletons)
   homePageSettingsType,
