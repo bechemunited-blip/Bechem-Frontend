@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import ProductCard from "@/components/ui/ProductCard";
 import { Icon } from "@iconify/react";
 import SectionHeader from "@/components/layout/SectionHeader";
+import ProductCheckoutModal from "@/components/ui/ProductCheckoutModal";
 
 interface ProductDetailClientProps {
     product: Product;
@@ -21,6 +22,8 @@ export default function ProductDetailClient({
 }: ProductDetailClientProps) {
     const [selectedSize, setSelectedSize] = useState<string>("");
     const [selectedImage, setSelectedImage] = useState(product.image);
+    const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+    const [sizeError, setSizeError] = useState(false);
 
     const allImages = [
         product.image,
@@ -80,11 +83,23 @@ export default function ProductDetailClient({
                             </div>
                         )}
 
+                        {sizeError && (
+                            <p className="text-red-500 text-sm font-bold mt-2">Please select a size before purchasing.</p>
+                        )}
+
                         <Button
                             variant="primary"
                             size="lg"
                             fullWidth
                             buttonClassName="mt-6"
+                            onClick={() => {
+                                if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+                                    setSizeError(true);
+                                    return;
+                                }
+                                setSizeError(false);
+                                setIsCheckoutOpen(true);
+                            }}
                         >
                             BUY
                         </Button>
@@ -150,6 +165,15 @@ export default function ProductDetailClient({
                     </section>
                 )}
             </div>
+
+            <ProductCheckoutModal
+                isOpen={isCheckoutOpen}
+                onClose={() => setIsCheckoutOpen(false)}
+                productName={product.displayTitle || product.name}
+                productId={product._id}
+                price={product.price}
+                selectedSize={selectedSize}
+            />
         </main>
     );
 }

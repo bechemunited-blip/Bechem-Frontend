@@ -3,8 +3,8 @@
 import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
-import { useAuth } from "@/context/AuthContext";
-import { useUI } from "@/context/UIContext";
+import { useAuth } from "@/store/hooks/useAuth";
+import { useUI } from "@/store/hooks/useUI";
 import { getInitials, formatRelativeTime } from "@/lib/community/data";
 
 // ─── Types ────────────────────────────────────────────────────────────────────

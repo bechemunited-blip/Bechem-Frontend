@@ -6,10 +6,10 @@ import Footer from "@/components/layout/Footer";
 import { client } from "@/lib/sanity.client";
 import { footerSettingsQuery } from "@/lib/sanity.queries";
 import { FooterSettings } from "@/lib/types";
-import { UIProvider } from "@/context/UIContext";
-import { AuthProvider } from "@/context/AuthContext";
 import AuthModal from "@/components/auth/AuthModal";
 import BackToTop from "@/components/ui/BackToTop";
+import StoreProvider from "@/store/provider";
+import AuthInitializer from "@/store/AuthInitializer";
 
 const monaSans = Mona_Sans({
   variable: "--font-mona-sans",
@@ -40,15 +40,14 @@ export default async function RootLayout({
         className={`${monaSans.variable} ${montserrat.variable} antialiased relative min-w-[320px] bg-neutral-0`}
         suppressHydrationWarning
       >
-        <AuthProvider>
-          <UIProvider>
-            <Navbar />
-            {children}
-            <Footer settings={footerSettings} />
-            <AuthModal />
-            <BackToTop />
-          </UIProvider>
-        </AuthProvider>
+        <StoreProvider>
+          <AuthInitializer />
+          <Navbar />
+          {children}
+          <Footer settings={footerSettings} />
+          <AuthModal />
+          <BackToTop />
+        </StoreProvider>
       </body>
     </html>
   );

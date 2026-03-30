@@ -1,6 +1,17 @@
-import Link from "next/link";
+"use client";
 
-export default function AdminNavigation() {
+import Link from "next/link";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+
+export default function AdminPage() {
+  return (
+    <ProtectedRoute requiredRole="admin">
+      <AdminNavigation />
+    </ProtectedRoute>
+  );
+}
+
+function AdminNavigation() {
   const navigationCards = [
     {
       title: "Players",
@@ -31,7 +42,7 @@ export default function AdminNavigation() {
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-16">
           <h1 className="text-6xl font-bold text-white mb-4 animate-fade-in">
-            🇬🇭 Bechem United FC
+            Bechem United FC
           </h1>
           <p className="text-xl text-green-200 max-w-2xl mx-auto">
             Official website management dashboard. Navigate to different

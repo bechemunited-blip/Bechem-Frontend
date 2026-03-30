@@ -6,7 +6,7 @@ import { Icon } from "@iconify/react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/store/hooks/useAuth";
 
 interface PaymentModalProps {
     isOpen: boolean;

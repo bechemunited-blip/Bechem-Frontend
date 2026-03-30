@@ -4,7 +4,7 @@ import React, { useState, useRef, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/store/hooks/useAuth";
 import {
     SEED_POSTS,
     REACTION_META,

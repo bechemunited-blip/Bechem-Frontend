@@ -18,8 +18,8 @@ interface JoinHuntersPackProps {
     fallbackImages?: Array<{ image: SanityImage }>;
 }
 
-import { useUI } from "@/context/UIContext";
-import { useAuth } from "@/context/AuthContext";
+import { useUI } from "@/store/hooks/useUI";
+import { useAuth } from "@/store/hooks/useAuth";
 import Link from "next/link";
 
 export default function JoinHuntersPack({ settings, fallbackImages }: JoinHuntersPackProps) {

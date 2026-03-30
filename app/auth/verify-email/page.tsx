@@ -6,7 +6,7 @@ import { Icon } from "@iconify/react";
 import NextImage from "next/image";
 import Link from "next/link";
 import { authService } from "@/lib/api/auth";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/store/hooks/useAuth";
 
 // ── Inner component that reads search params ───────────────────────────────────
 function VerifyEmailContent() {

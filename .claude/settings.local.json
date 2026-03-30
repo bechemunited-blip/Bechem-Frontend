@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(js|ts\\)$\")",
+      "Bash(grep -r \"community\\\\|posts\" /c/Users/bizza/Bechem-Frontend/lib/api/ --include=*.ts)",
+      "Bash(find /c/Users/bizza/Bechem-Backend/sanity -type f -name *.js)",
+      "Bash(grep -r \"fan-posts\\\\|community-posts\" /c/Users/bizza/Bechem-Frontend --include=*.ts --include=*.tsx)"
+    ]
+  }
+}

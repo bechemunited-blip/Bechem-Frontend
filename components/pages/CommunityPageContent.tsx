@@ -11,8 +11,8 @@ import SectionHeader from "@/components/layout/SectionHeader";
 import { CommunityPageSettings, CommunityProject, SanityImage } from "@/lib/types";
 import { urlFor } from "@/lib/sanity.client";
 import JoinHuntersPack from "@/components/layout/JoinHuntersPack";
-import { useUI } from "@/context/UIContext";
-import { useAuth } from "@/context/AuthContext";
+import { useUI } from "@/store/hooks/useUI";
+import { useAuth } from "@/store/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import PaymentModal from "@/components/ui/PaymentModal";
 import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
@@ -327,18 +327,37 @@ export default function CommunityPageContent({
 
                     {/* CTA Row */}
                     <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <button
-                            onClick={() => openAuthModal("signup")}
-                            className="w-full sm:w-auto px-10 py-4 rounded-full bg-primary text-white font-black uppercase tracking-widest text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 hover:-translate-y-0.5 transition-all duration-300"
-                        >
-                            Join Free Today
-                        </button>
-                        <button
-                            onClick={() => openAuthModal("signin")}
-                            className="w-full sm:w-auto px-10 py-4 rounded-full border-2 border-neutral-200 text-neutral-7 font-black uppercase tracking-widest text-sm hover:border-primary hover:text-primary transition-all duration-300"
-                        >
-                            Already a Member? Sign In
-                        </button>
+                        {!isAuthenticated ? (
+                            <>
+                                <button
+                                    onClick={() => openAuthModal("signup")}
+                                    className="w-full sm:w-auto px-10 py-4 rounded-full bg-primary text-white font-black uppercase tracking-widest text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 hover:-translate-y-0.5 transition-all duration-300"
+                                >
+                                    Join Free Today
+                                </button>
+                                <button
+                                    onClick={() => openAuthModal("signin")}
+                                    className="w-full sm:w-auto px-10 py-4 rounded-full border-2 border-neutral-200 text-neutral-7 font-black uppercase tracking-widest text-sm hover:border-primary hover:text-primary transition-all duration-300"
+                                >
+                                    Already a Member? Sign In
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={() => openPaymentModal("donate")}
+                                    className="w-full sm:w-auto px-10 py-4 rounded-full bg-primary text-white font-black uppercase tracking-widest text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 hover:-translate-y-0.5 transition-all duration-300"
+                                >
+                                    Donate to a Project
+                                </button>
+                                <button
+                                    onClick={() => openPaymentModal("volunteer")}
+                                    className="w-full sm:w-auto px-10 py-4 rounded-full border-2 border-neutral-200 text-neutral-7 font-black uppercase tracking-widest text-sm hover:border-primary hover:text-primary transition-all duration-300"
+                                >
+                                    Volunteer With Us
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </section>

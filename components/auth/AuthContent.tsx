@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Icon } from "@iconify/react";
 import NextImage from "next/image";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/store/hooks/useAuth";
 import { authService } from "@/lib/api/auth";
 
 interface AuthContentProps {

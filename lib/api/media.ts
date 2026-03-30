@@ -59,6 +59,10 @@ export async function uploadMedia(
     // File field must be named "file"
     formData.append("file", file);
 
+    console.log(`[Media Upload] Uploading to ${BASE_URL}/media/upload`);
+    console.log(`[Media Upload] Token present: ${!!token}`);
+    console.log(`[Media Upload] File: ${file.name} (${file.size} bytes, ${file.type})`);
+
     const response = await fetch(`${BASE_URL}/media/upload`, {
         method: "POST",
         headers: {
@@ -68,13 +72,26 @@ export async function uploadMedia(
         body: formData,
     });
 
+    console.log(`[Media Upload] Response status: ${response.status}`);
     const data = await response.json();
+    console.log(`[Media Upload] Response data:`, data);
 
     if (!response.ok) {
         throw new Error(data.message || `Upload failed (${response.status})`);
     }
 
-    return data;
+    // Moleculer's multipart handler wraps the service response in an array
+    // (one entry per uploaded file). Unwrap it to get the actual response.
+    // Backend service returns: { success: true, file: { id, url, format, ... } }
+    // Gateway returns: [{ success: true, file: { id, url, format, ... } }]
+    const result = Array.isArray(data) ? data[0] : data;
+
+    if (!result?.file?.url) {
+        console.error("[Media Upload] Unexpected response shape:", result);
+        throw new Error("Upload succeeded but no file URL returned");
+    }
+
+    return result as MediaUploadResponse;
 }
 
 /**

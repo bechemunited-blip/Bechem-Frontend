@@ -8,7 +8,7 @@ import Card from "@/components/ui/Card";
 import PageHeader from "@/components/layout/PageHeader";
 import SectionHeader from "@/components/layout/SectionHeader";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/store/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { authService } from "@/lib/api/auth";
 import { User } from "@/lib/api/types";

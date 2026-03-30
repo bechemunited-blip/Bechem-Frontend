@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { Icon } from "@iconify/react";
-import { useUI } from "@/context/UIContext";
+import { useUI } from "@/store/hooks/useUI";
 import { useRouter } from "next/navigation";
 import AuthContent from "./AuthContent";
 

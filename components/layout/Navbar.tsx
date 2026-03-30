@@ -8,12 +8,12 @@ import Button from "../ui/Button";
 import { Icon } from "@iconify/react";
 import { usePathname, useRouter } from "next/navigation";
 
-import { useUI } from "@/context/UIContext";
-import { useAuth } from "@/context/AuthContext";
+import { useUI } from "@/store/hooks/useUI";
+import { useAuth } from "@/store/hooks/useAuth";
 
 export default function Navbar() {
   const { openAuthModal } = useUI();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -166,7 +166,9 @@ export default function Navbar() {
           </Link>
 
           {/* Right: Auth */}
-          {isAuthenticated && user ? (
+          {isLoading ? (
+            <div className="w-9 h-9 rounded-full bg-neutral-200 animate-pulse" />
+          ) : isAuthenticated && user ? (
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
