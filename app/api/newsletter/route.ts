@@ -15,9 +15,6 @@ export async function POST(req: Request) {
             );
         }
 
-        // LOGGING (As requested in Issue 2, Step 3)
-        console.log(`[Newsletter Signup] Email: ${email}, Source: ${source || "footer"}`);
-
         // If Resend is configured, try sending a real welcome email
         if (resend) {
             try {
@@ -36,7 +33,6 @@ export async function POST(req: Request) {
                     );
                 }
 
-                console.log("[Resend Success]: Email sent successfully", data?.id);
                 return NextResponse.json({
                     success: true,
                     message: "Subscription successful — check your inbox for a welcome email!"

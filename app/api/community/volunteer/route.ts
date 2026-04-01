@@ -48,8 +48,6 @@ export async function POST(req: NextRequest) {
         // ── Optional: persist to DB / Sanity ─────────────────────────────────────
         // await sanityClient.create({ _type: "volunteerApplication", name, email, phone, skills, message, projectTitle });
 
-        console.log("[Volunteer] Registration received:", { name, email, phone, projectTitle, skills, message });
-
         return NextResponse.json({ success: true });
     } catch (err: unknown) {
         console.error("Volunteer API error:", err);

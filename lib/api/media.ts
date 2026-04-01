@@ -59,10 +59,6 @@ export async function uploadMedia(
     // File field must be named "file"
     formData.append("file", file);
 
-    console.log(`[Media Upload] Uploading to ${BASE_URL}/media/upload`);
-    console.log(`[Media Upload] Token present: ${!!token}`);
-    console.log(`[Media Upload] File: ${file.name} (${file.size} bytes, ${file.type})`);
-
     const response = await fetch(`${BASE_URL}/media/upload`, {
         method: "POST",
         headers: {
@@ -72,9 +68,7 @@ export async function uploadMedia(
         body: formData,
     });
 
-    console.log(`[Media Upload] Response status: ${response.status}`);
     const data = await response.json();
-    console.log(`[Media Upload] Response data:`, data);
 
     if (!response.ok) {
         throw new Error(data.message || `Upload failed (${response.status})`);

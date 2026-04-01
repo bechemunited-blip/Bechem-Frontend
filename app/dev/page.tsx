@@ -15,8 +15,6 @@ export default function ComponentShowcasePage() {
   const [selectValue, setSelectValue] = useState("");
   const [checkboxChecked, setCheckboxChecked] = useState(false);
 
-  console.log("[ComponentShowcase] Mounted");
-
   return (
     <main className="container-wide py-16 md:py-20">
       <div className="max-w-6xl mx-auto">

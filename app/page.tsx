@@ -61,7 +61,7 @@ export default async function Home() {
     }
   } catch {
     // This should technically not be reached with Promise.allSettled, but good for safety
-    console.log("Home: Backend fixtures unavailable, using fallbacks.");
+    // Backend fixtures unavailable, using fallbacks
   }
 
   // Fallback to mock if empty

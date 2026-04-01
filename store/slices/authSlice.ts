@@ -23,16 +23,9 @@ export const verifyAndFetchProfile = createAsyncThunk(
         try {
             // Step 1: Validate token is still valid
             await authService.verifyToken(token);
-            console.log("[Redux Auth] Token verified, fetching full profile...");
 
             // Step 2: Fetch full profile with avatar/headerImage
             const user = await authService.getProfile(token);
-            console.log("[Redux Auth] Full profile fetched:", {
-                id: user.id,
-                name: user.name,
-                avatar: user.avatar ? "present" : "missing",
-                headerImage: user.headerImage ? "present" : "missing",
-            });
             return { user, token };
         } catch (error: unknown) {
             const err = error as { message?: string };

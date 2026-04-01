@@ -30,25 +30,19 @@ function VerifyEmailContent() {
     };
 
     useEffect(() => {
-        console.log(`[VerifyEmail] 🔍 Page loaded. Token from URL:`, token ? token.substring(0, 30) + '...' : 'NONE');
-
         if (!token) {
             setTimeout(() => {
-                console.log(`[VerifyEmail] ❌ No token found in URL params`);
                 setStatus("error");
                 setMessage("No verification token found in the link. Please check your email and try again.");
             }, 0);
             return;
         }
 
-        console.log(`[VerifyEmail] ⏳ Calling authService.verifyEmail...`);
         authService
             .verifyEmail(token)
             .then((res) => {
-                console.log(`[VerifyEmail] ✅ Verification SUCCESS:`, res);
                 // Auto-login if the backend returns a token after verification
                 if (res.token && res.user) {
-                    console.log(`[VerifyEmail] 🔐 Auto-login with token & user`);
                     login(res.token, res.user);
                 }
                 setStatus("success");
@@ -58,8 +52,6 @@ function VerifyEmailContent() {
             })
             .catch((err: unknown) => {
                 const raw = (err as { message?: string }).message || "";
-                console.log(`[VerifyEmail] ❌ Verification FAILED (raw):`, raw);
-                console.log(`[VerifyEmail] ❌ Full error object:`, err);
                 setStatus("error");
                 setMessage(friendlyError(raw));
             });
